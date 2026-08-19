@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>KPP Mining - Safety Dashboard</title>
 <link rel="manifest" href="manifest.json"/>
+<link rel="icon" href="icon-192.png" type="image/png"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
 <meta name="theme-color" content="#22c55e"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
@@ -224,10 +226,6 @@ tbody tr:hover{background:rgba(34,197,94,.04);}
     <img src="logos/logo-ciss.png" alt="CISS">
     <img src="logos/logo-asto.png" alt="ASTO">
     <img src="logos/logo-plant-asto.jpeg" alt="Plant ASTO">
-  </div>
-  <div class="logo-row">
-    <div class="logo">⛏</div>
-    <div class="brand"><b>KPP Mining</b><span>Safety Dashboard</span></div>
   </div>
   <div class="menu-title">Main Menu</div>
   <ul class="menu">
@@ -839,9 +837,8 @@ function getDateFromSelects(tglId, blnId, thnId) {
   var mm = Number(m) < 10 ? '0' + Number(m) : String(m);
   var dd = Number(d) < 10 ? '0' + Number(d) : String(d);
   return y + '-' + mm + '-' + dd;
-}Melanjutkan dari titik terakhir — langsung sambung kode JavaScript:
+}
 
-```javascript
 function fillJamSelect() {
   var el = document.getElementById('inspJam');
   if (!el) return;
@@ -1915,7 +1912,6 @@ function submitInsp() {
       files.forEach(function(file) {
         // Kompres jika gambar terlalu besar
         if (file.size > 1024 * 1024 && file.type.startsWith('image/')) {
-          var img = new Image```javascript
           var img = new Image();
           var url = URL.createObjectURL(file);
           img.onload = function() {
