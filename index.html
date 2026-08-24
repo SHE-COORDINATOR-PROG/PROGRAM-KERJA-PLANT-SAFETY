@@ -232,10 +232,6 @@ tbody tr:hover{background:rgba(34,197,94,.04);}
     <li><a class="active" data-view="dashboard"><span class="ic">📊</span>Dashboard</a></li>
     <li><a data-view="upload"><span class="ic">📁</span>Upload Dokumen</a></li>
     <li><a data-view="history"><span class="ic">🕘</span>Riwayat Upload</a></li>
-    <li><a data-view="aspek"><span class="ic">📋</span>Riwayat Aspek</a></li>
-    <li><a data-view="rinspeksi"><span class="ic">🔍</span>Riwayat Inspeksi</a></li>
-    <li><a data-view="inspeksi"><span class="ic">📝</span>Form Inspeksi</a></li>
-    <li><a data-view="program"><span class="ic">✅</span>Program</a></li>
     <div class="menu-sep"></div>
     <li><a data-view="setting"><span class="ic">⚙️</span>Setting Target</a></li>
   </ul>
@@ -285,8 +281,7 @@ tbody tr:hover{background:rgba(34,197,94,.04);}
 
       <div class="kpi-grid">
         <div class="kpi"><div class="lbl">Program Selesai</div><div class="val" id="kpi1">0</div><div class="sub" id="kpi1sub">dari 30 program</div></div>
-        <div class="kpi blue"><div class="lbl">Pencapaian</div><div class="val" id="kpi2">0%</div><div class="sub">program + inspeksi</div></div>
-        <div class="kpi purple"><div class="lbl">Total Inspeksi</div><div class="val" id="kpi5">0</div><div class="sub" id="kpi5sub">form disubmit</div></div>
+        <div class="kpi blue"><div class="lbl">Pencapaian</div><div class="val" id="kpi2">0%</div><div class="sub">upload vs target program</div></div>
         <div class="kpi orange"><div class="lbl">Upload Dok</div><div class="val" id="kpi3">0</div><div class="sub">file tersimpan</div></div>
       </div>
 
@@ -308,7 +303,7 @@ tbody tr:hover{background:rgba(34,197,94,.04);}
         <table>
           <thead><tr>
             <th>Kategori</th><th>Target</th><th>Selesai</th>
-            <th>Inspeksi</th><th>Total Actual</th><th>% Pencapaian</th><th>Status</th>
+            <th>% Pencapaian</th><th>Status</th>
           </tr></thead>
           <tbody id="summaryBody"></tbody>
           <tfoot id="summaryFoot"></tfoot>
@@ -319,8 +314,8 @@ tbody tr:hover{background:rgba(34,197,94,.04);}
       <div class="tbl-wrap">
         <table>
           <thead><tr>
-            <th>Bulan</th><th>Target Prog</th><th>Target Insp</th>
-            <th>Program Submit</th><th>Inspeksi</th>
+            <th>Bulan</th><th>Target Prog</th>
+            <th>Program Tercapai</th>
             <th>Upload Dok</th><th>Total Aktivitas</th><th>Status</th>
           </tr></thead>
           <tbody id="bulananBody"></tbody>
@@ -380,118 +375,11 @@ tbody tr:hover{background:rgba(34,197,94,.04);}
     </div>
   </div>
 
-  <!-- ===== RIWAYAT ASPEK ===== -->
-  <div id="view-aspek" class="view">
-    <div class="panel">
-      <div class="panel-title"><div class="dot"></div>Riwayat Aspek Program</div>
-      <div class="tbl-wrap">
-        <table>
-          <thead><tr><th>Tanggal</th><th>Program</th><th>Nama Program</th><th>Ringkas</th></tr></thead>
-          <tbody id="aspekBody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== RIWAYAT INSPEKSI ===== -->
-  <div id="view-rinspeksi" class="view">
-    <div class="panel">
-      <div class="section-header">
-        <div class="section-title"><div class="dot"></div>Riwayat Inspeksi</div>
-        <button class="btn danger sm" onclick="clearInspeksi()">Hapus Semua</button>
-      </div>
-      <div id="inspRiwayatList"><div class="hint">Belum ada data inspeksi.</div></div>
-    </div>
-  </div>
-
-  <!-- ===== FORM INSPEKSI ===== -->
-  <div id="view-inspeksi" class="view">
-    <div class="panel">
-      <div class="panel-title"><div class="dot"></div>Form Inspeksi</div>
-      <div class="grid2">
-        <div class="form-group">
-          <label class="form-label">Jenis Inspeksi</label>
-          <select id="inspJenis" class="form-select" onchange="renderChecklist()">
-            <option value="">-- Pilih Jenis --</option>
-            <option>Inspeksi Crane</option>
-            <option>Inspeksi Panel Listrik</option>
-            <option>Inspeksi Oil Trap</option>
-            <option>Inspeksi Toolbox</option>
-            <option>Inspeksi Crane Truck</option>
-            <option>Inspeksi Merlo</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Tanggal Inspeksi</label>
-          <div class="date-selects">
-            <select id="inspTgl" class="form-select"></select>
-            <select id="inspBln" class="form-select"></select>
-            <select id="inspThn" class="form-select"></select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Nama Inspektor</label>
-          <input type="text" id="inspNama" placeholder="Nama inspektor"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Lokasi</label>
-          <input type="text" id="inspLokasi" placeholder="Lokasi inspeksi"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Unit / Kode</label>
-          <input type="text" id="inspUnit" placeholder="Kode unit"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Jam Mulai</label>
-          <select id="inspJam" class="form-select">
-            <option value="">-- Pilih Jam --</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">📸 Upload Foto (maks 6)</label>
-        <input type="file" id="inspFoto" accept="image/*" multiple onchange="previewFoto()"/>
-        <div class="foto-grid" id="fotoPreview"></div>
-      </div>
-
-      <div id="checklistWrap" style="display:none;margin-top:14px;">
-        <b style="font-size:13px;display:block;margin-bottom:8px;">Checklist Inspeksi</b>
-        <div class="tbl-wrap">
-          <table class="chk-table">
-            <thead><tr><th style="width:36px">No</th><th>Item</th><th id="chkHeader" style="width:140px">Kondisi</th><th style="width:160px">Catatan</th></tr></thead>
-            <tbody id="chkBody"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="btnrow" style="margin-top:16px;">
-        <button class="btn sm" type="button" onclick="addInspBlock()">➕ Tambah Blok</button>
-        <button class="btn primary" onclick="submitInsp()" style="flex:1;text-align:center;">✅ Submit Inspeksi</button>
-        <button class="btn danger" onclick="resetInsp()">Reset</button>
-      </div>
-      <div id="inspBlocks"></div>
-      <div class="hint" id="inspHint" style="margin-top:10px;">Pilih jenis inspeksi, isi data, lalu klik Submit.</div>
-    </div>
-  </div>
-
-  <!-- ===== PROGRAM ===== -->
-  <div id="view-program" class="view">
-    <div class="panel">
-      <div class="panel-title"><div class="dot"></div>Program Kerja (1–30)</div>
-      <div class="hint" style="margin-bottom:10px;">Klik program untuk mengisi form pelaksanaan.</div>
-      <div class="prog-grid" id="progGrid"></div>
-      <div id="progForm" style="margin-top:16px;">
-        <div class="hint" style="text-align:center;padding:20px;">Pilih program di atas untuk mulai mengisi.</div>
-      </div>
-    </div>
-  </div>
-
   <!-- ===== SETTING TARGET ===== -->
   <div id="view-setting" class="view">
     <div class="panel">
       <div class="panel-title"><div class="dot"></div>⚙️ Setting Target Bulanan</div>
-      <div class="hint" style="margin-bottom:16px;">Atur target program dan inspeksi per bulan untuk tracking pencapaian.</div>
+      <div class="hint" style="margin-bottom:16px;">Atur target program per bulan untuk tracking pencapaian.</div>
 
       <div class="form-group">
         <label class="form-label">Tahun</label>
@@ -501,18 +389,11 @@ tbody tr:hover{background:rgba(34,197,94,.04);}
       <div class="summary-title">🎯 Target Program per Bulan</div>
       <div class="target-grid" id="targetProgGrid"></div>
 
-      <div class="summary-title" style="margin-top:16px;">🔍 Target Inspeksi per Bulan</div>
-      <div class="target-grid" id="targetInspGrid"></div>
-
       <div class="summary-title" style="margin-top:16px;">📊 Target Keseluruhan</div>
       <div class="grid2">
         <div class="form-group">
           <label class="form-label">Total Target Program (default: 30)</label>
           <input type="number" id="settingTotalProg" value="30" min="1" max="100"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Target Inspeksi Tahunan</label>
-          <input type="number" id="settingTotalInsp" value="36" min="1" max="500"/>
         </div>
       </div>
 
@@ -530,7 +411,6 @@ tbody tr:hover{background:rgba(34,197,94,.04);}
           <thead><tr>
             <th>Bulan</th>
             <th>Target Prog</th><th>Actual Prog</th><th>% Prog</th>
-            <th>Target Insp</th><th>Actual Insp</th><th>% Insp</th>
             <th>Status</th>
           </tr></thead>
           <tbody id="settingPreviewBody"></tbody>
@@ -553,7 +433,7 @@ tbody tr:hover{background:rgba(34,197,94,.04);}
 // Menggantikan Supabase — endpoint /api/<table> di-handle oleh
 // api/[table].js yang connect ke Neon Postgres pakai DATABASE_URL.
 // ============================================================
-var API_BASE = ''; // kosong = relative ke domain sendiri, cth: /api/inspeksi
+var API_BASE = ''; // kosong = relative ke domain sendiri, cth: /api/upload
 
 function pgFrom(table) {
   return {
@@ -584,9 +464,7 @@ var db = { from: pgFrom };
 // ============================================================
 // STORAGE KEYS
 // ============================================================
-var KP = 'kpp_programs_v3';
 var KU = 'kpp_uploads_v3';
-var KI = 'kpp_inspections_v3';
 var KT = 'kpp_targets_v1';
 
 // ============================================================
@@ -670,38 +548,9 @@ var KATEGORI = {
   "Sertifikasi & Admin":[28,29,30]
 };
 
-var PROG_INSPEKSI = {5:"Inspeksi Toolbox",11:"Inspeksi Crane",20:"Inspeksi Panel Listrik"};
-
-var INSP_MAP = {
-  "Inspeksi Crane":{header:"Kondisi",opts:["OK","NOT OK","N/A"],items:[
-    "Hook - Kondisi fisik","Hook - Safety latch berfungsi","Hook - Tidak ada deformasi",
-    "Rantai/Sling - Tidak ada putus/aus","Struktur boom - Tidak ada retak",
-    "Limit switch - Berfungsi","Label kapasitas - Terpasang jelas"]},
-  "Inspeksi Panel Listrik":{header:"Kondisi",opts:["OK","NOT OK","N/A"],items:[
-    "Panel - Kondisi fisik tidak rusak","Panel - Pintu dapat dikunci",
-    "Kabel - Tidak ada yang terkelupas","MCB/ELCB - Berfungsi normal",
-    "Label - Terpasang lengkap","Grounding - Terpasang","Kebersihan dalam panel"]},
-  "Inspeksi Oil Trap":{header:"Kondisi",opts:["OK","NOT OK","N/A"],items:[
-    "Oil Trap - Tidak bocor","Saluran tidak tersumbat",
-    "Volume tidak melebihi batas","Penutup terpasang dengan baik","Area sekitar bersih"]},
-  "Inspeksi Toolbox":{header:"Hasil",opts:["LENGKAP","TIDAK LENGKAP","RUSAK"],items:[
-    "Box/Laci - Kondisi fisik tidak retak","Engsel dan kunci berfungsi",
-    "Isi tools lengkap sesuai daftar","Tools tidak ada yang rusak",
-    "Tools tidak ada yang hilang","Label toolbox terpasang","Kebersihan toolbox"]},
-  "Inspeksi Crane Truck":{header:"Kondisi",opts:["OK","NOT OK","N/A"],items:[
-    "Boom - Kondisi fisik","Outrigger - Berfungsi","Hook - Safety latch",
-    "Tali/Sling - Kondisi baik","Kapasitas sesuai SWL","Rem berfungsi",
-    "Lampu berfungsi","SIM Operator valid"]},
-  "Inspeksi Merlo":{header:"Kondisi",opts:["OK","NOT OK","N/A"],items:[
-    "Fork - Kondisi fisik tidak retak","Mast - Kondisi baik",
-    "Rem servis berfungsi","Rem parkir berfungsi","Lampu lengkap dan berfungsi",
-    "ROPS/FOPS terpasang","Sabuk pengaman ada dan berfungsi","SIM Operator valid"]}
-};
-
 var PAGE_TITLES = {
   dashboard:'Dashboard',upload:'Upload Dokumen',history:'Riwayat Upload',
-  aspek:'Riwayat Aspek',rinspeksi:'Riwayat Inspeksi',inspeksi:'Form Inspeksi',
-  program:'Program Kerja',setting:'Setting Target'
+  setting:'Setting Target'
 };
 
 // ============================================================
@@ -762,11 +611,7 @@ function navigate(viewName) {
   closeSidebar();
   if (viewName === 'dashboard') { refreshAll(); }
   if (viewName === 'history') { renderHistory(); }
-  if (viewName === 'aspek') { renderAspek(); }
-  if (viewName === 'rinspeksi') { renderRiwayatInspeksi(); }
-  if (viewName === 'program') { renderProgGrid(); }
   if (viewName === 'upload') { initDD(); fillDateSelects('upTgl','upBln','upThn'); }
-  if (viewName === 'inspeksi') { resetInsp(); }
   if (viewName === 'setting') { initSetting(); }
 }
 
@@ -839,22 +684,6 @@ function getDateFromSelects(tglId, blnId, thnId) {
   return y + '-' + mm + '-' + dd;
 }
 
-function fillJamSelect() {
-  var el = document.getElementById('inspJam');
-  if (!el) return;
-  el.innerHTML = '<option value="">-- Pilih Jam --</option>';
-  for (var h = 0; h < 24; h++) {
-    for (var mn = 0; mn < 60; mn += 30) {
-      var hh = h < 10 ? '0' + h : String(h);
-      var mm = mn === 0 ? '00' : '30';
-      var val = hh + ':' + mm;
-      var o = document.createElement('option');
-      o.value = val; o.textContent = val;
-      el.appendChild(o);
-    }
-  }
-}
-
 function fillFilterTahun() {
   var el = document.getElementById('fTahun');
   if (!el) return;
@@ -917,8 +746,6 @@ function matchFilter(isoDate) {
 // ============================================================
 // HITUNG PENCAPAIAN
 // ============================================================
-function getProgDate(x) { return (x && x.fields && x.fields.tgl) ? x.fields.tgl : (x && x.at ? x.at : null); }
-function getInspDate(x) { return (x && x.tgl) ? x.tgl : (x && x.at ? x.at : null); }
 function getUpDate(x)   { return (x && x.tglUpload) ? x.tglUpload : (x && x.at ? x.at : null); }
 
 function toDateObj(iso) {
@@ -934,45 +761,34 @@ function toDateObj(iso) {
 function getSetting() {
   return getObjLS(KT, {
     totalProg: 30,
-    totalInsp: 36,
-    progBulan: {},
-    inspBulan: {}
+    progBulan: {}
   });
 }
 
+// Pencapaian dihitung dari jumlah Upload Dokumen dibanding Target Program.
+// "Program Selesai" kini ditentukan dari Upload Dokumen: sebuah program (1-30)
+// dianggap selesai jika sudah ada minimal satu dokumen yang diupload untuknya
+// (menu Program dihapus, jadi tidak ada lagi form submit terpisah).
 function hitungPencapaian() {
-  var allProgs = getLS(KP);
-  var allInsps = getLS(KI);
   var allUps   = getLS(KU);
   var setting  = getSetting();
 
-  var progs = allProgs.filter(function(x) { return matchFilter(getProgDate(x)); });
-  var insps = allInsps.filter(function(x) { return matchFilter(getInspDate(x)); });
-  var ups   = allUps.filter(function(x)   { return matchFilter(getUpDate(x)); });
+  var ups = allUps.filter(function(x) { return matchFilter(getUpDate(x)); });
 
-  // Program selesai: unik per nomor program
-  var doneSet = new Set(progs.map(function(x) { return x.no; }));
+  // Program selesai: unik per nomor program yang punya upload
+  var doneSet = new Set(ups.map(function(x) { return x.no; }));
 
-  // Inspeksi juga menandai program terkait selesai
-  insps.forEach(function(i) {
-    Object.keys(PROG_INSPEKSI).forEach(function(progNoStr) {
-      if (i.jenis === PROG_INSPEKSI[Number(progNoStr)]) doneSet.add(Number(progNoStr));
-    });
-  });
-
-  var progDone   = doneSet.size;
-  var inspDone   = insps.length;
+  var progDone    = doneSet.size;
   var totalTarget = setting.totalProg || 30;
-  var totalActual = progDone + inspDone;
-  var denominator = (totalTarget * 2);
-  var pct = denominator > 0 ? Math.min(100, Math.round(totalActual / denominator * 100)) : 0;
+  var uploadCount = ups.length;
+  var totalActual = uploadCount;
+  var pct = totalTarget > 0 ? Math.min(100, Math.round(uploadCount / totalTarget * 100)) : 0;
 
   return {
-    progDone: progDone, inspDone: inspDone,
-    totalTarget: totalTarget, totalActual: totalActual,
+    progDone: progDone,
+    totalTarget: totalTarget, totalActual: totalActual, uploadCount: uploadCount,
     pct: pct, doneSet: doneSet,
-    progs: progs, insps: insps, ups: ups,
-    allProgs: allProgs, allInsps: allInsps, allUps: allUps,
+    ups: ups, allUps: allUps,
     setting: setting
   };
 }
@@ -1038,8 +854,8 @@ function buildCharts(data) {
   killChart('c1'); killChart('c2'); killChart('c3'); killChart('c4');
 
   // --- Chart 1: Bar Program vs Target (multi-color) ---
-  var c1Labels = ['Target\nProgram','Program\nSelesai','Total\nInspeksi','Upload\nDok'];
-  var c1Data   = [data.totalTarget, data.progDone, data.inspDone, (data.allUps||[]).length];
+  var c1Labels = ['Target\nProgram','Program\nSelesai','Upload\nDok'];
+  var c1Data   = [data.totalTarget, data.progDone, data.uploadCount];
   new Chart(document.getElementById('c1'), {
     type: 'bar',
     data: {
@@ -1047,8 +863,8 @@ function buildCharts(data) {
       datasets: [{
         label: 'Jumlah',
         data: c1Data,
-        backgroundColor: [COLORS.blue.bg, COLORS.green.bg, COLORS.purple.bg, COLORS.orange.bg],
-        borderColor:      [COLORS.blue.border, COLORS.green.border, COLORS.purple.border, COLORS.orange.border],
+        backgroundColor: [COLORS.blue.bg, COLORS.green.bg, COLORS.orange.bg],
+        borderColor:      [COLORS.blue.border, COLORS.green.border, COLORS.orange.border],
         borderWidth: 2, borderRadius: 8, borderSkipped: false
       }]
     },
@@ -1142,19 +958,13 @@ function buildCharts(data) {
     var targetProgBulan = labels12.map(function(nm, idx) {
       return (setting.progBulan && setting.progBulan[idx + 1]) || 0;
     });
-    var targetInspBulan = labels12.map(function(nm, idx) {
-      return (setting.inspBulan && setting.inspBulan[idx + 1]) || 0;
-    });
     new Chart(document.getElementById('c4'), {
       type: 'bar',
       data: {
         labels: labels12,
         datasets: [
-          { label: 'Program', data: perBulan(data.allProgs, getProgDate), backgroundColor: COLORS.green.bg, borderColor: COLORS.green.border, borderWidth: 2, borderRadius: 4 },
-          { label: 'Inspeksi', data: perBulan(data.allInsps, getInspDate), backgroundColor: COLORS.blue.bg, borderColor: COLORS.blue.border, borderWidth: 2, borderRadius: 4 },
           { label: 'Upload', data: perBulan(data.allUps, getUpDate), backgroundColor: COLORS.purple.bg, borderColor: COLORS.purple.border, borderWidth: 2, borderRadius: 4 },
-          { label: 'Target Prog', data: targetProgBulan, type: 'line', borderColor: COLORS.orange.border, backgroundColor: 'transparent', borderWidth: 2, borderDash: [5,4], pointRadius: 3, tension: 0.3 },
-          { label: 'Target Insp', data: targetInspBulan, type: 'line', borderColor: COLORS.pink.border, backgroundColor: 'transparent', borderWidth: 2, borderDash: [5,4], pointRadius: 3, tension: 0.3 }
+          { label: 'Target Prog', data: targetProgBulan, type: 'line', borderColor: COLORS.orange.border, backgroundColor: 'transparent', borderWidth: 2, borderDash: [5,4], pointRadius: 3, tension: 0.3 }
         ]
       },
       options: {
@@ -1187,9 +997,7 @@ function buildCharts(data) {
       data: {
         labels: dl,
         datasets: [
-          { label: 'Program', data: perDay(data.allProgs, getProgDate), borderColor: COLORS.green.border, backgroundColor: 'rgba(34,197,94,.10)', borderWidth: 2, tension: .35, fill: true, pointRadius: 4, pointBackgroundColor: COLORS.green.border },
-          { label: 'Inspeksi', data: perDay(data.allInsps, getInspDate), borderColor: COLORS.blue.border, backgroundColor: 'rgba(59,130,246,.08)', borderWidth: 2, tension: .35, fill: true, pointRadius: 4, pointBackgroundColor: COLORS.blue.border },
-          { label: 'Upload', data: perDay(data.allUps, getUpDate), borderColor: COLORS.purple.border, backgroundColor: 'rgba(139,92,246,.06)', borderWidth: 2, tension: .35, fill: true, pointRadius: 4, pointBackgroundColor: COLORS.purple.border }
+          { label: 'Upload', data: perDay(data.allUps, getUpDate), borderColor: COLORS.purple.border, backgroundColor: 'rgba(139,92,246,.08)', borderWidth: 2, tension: .35, fill: true, pointRadius: 4, pointBackgroundColor: COLORS.purple.border }
         ]
       },
       options: {
@@ -1212,31 +1020,24 @@ function buildSummaryTable(data) {
   var tfoot = document.getElementById('summaryFoot');
   if (!tbody) return;
   var doneSet = data.doneSet;
-  var insps   = data.insps;
   var html = '';
-  var totTarget = 0, totSelesai = 0, totInsp = 0, totActual = 0;
+  var totTarget = 0, totSelesai = 0;
 
   Object.keys(KATEGORI).forEach(function(kat) {
     var nos     = KATEGORI[kat];
     var target  = nos.length;
     var selesai = nos.filter(function(n) { return doneSet.has(n); }).length;
-    var inspKat = insps.filter(function(i) {
-      return nos.some(function(n) { return PROG_INSPEKSI[n] && i.jenis === PROG_INSPEKSI[n]; });
-    }).length;
-    var actual = selesai + inspKat;
-    var pct    = target > 0 ? Math.round(actual / (target * 2) * 100) : 0;
+    var pct    = target > 0 ? Math.round(selesai / target * 100) : 0;
     var status = pct >= 100
       ? '<span class="badge ok">✅ Tercapai</span>'
       : pct >= 50
         ? '<span class="badge warn">⏳ Proses</span>'
         : '<span class="badge notok">❌ Kurang</span>';
-    totTarget += target; totSelesai += selesai; totInsp += inspKat; totActual += actual;
+    totTarget += target; totSelesai += selesai;
     html += '<tr>' +
       '<td><b>' + esc(kat) + '</b></td>' +
       '<td style="text-align:center;">' + target + '</td>' +
       '<td style="text-align:center;"><span class="badge prog">' + selesai + '</span></td>' +
-      '<td style="text-align:center;"><span class="badge insp">' + inspKat + '</span></td>' +
-      '<td style="text-align:center;"><b>' + actual + '</b></td>' +
       '<td style="text-align:center;"><b>' + pct + '%</b></td>' +
       '<td>' + status + '</td>' +
     '</tr>';
@@ -1244,13 +1045,11 @@ function buildSummaryTable(data) {
   tbody.innerHTML = html;
 
   if (tfoot) {
-    var totPct = totTarget > 0 ? Math.round(totActual / (totTarget * 2) * 100) : 0;
+    var totPct = totTarget > 0 ? Math.round(totSelesai / totTarget * 100) : 0;
     tfoot.innerHTML = '<tr style="font-weight:900;">' +
       '<td><b>TOTAL</b></td>' +
       '<td style="text-align:center;"><b>' + totTarget + '</b></td>' +
       '<td style="text-align:center;"><b>' + totSelesai + '</b></td>' +
-      '<td style="text-align:center;"><b>' + totInsp + '</b></td>' +
-      '<td style="text-align:center;"><b>' + totActual + '</b></td>' +
       '<td style="text-align:center;"><b style="color:#16a34a;">' + totPct + '%</b></td>' +
       '<td></td>' +
     '</tr>';
@@ -1269,34 +1068,27 @@ function buildBulananTable(data) {
   if (label) label.textContent = tahun;
 
   var html = '';
-  var totP = 0, totI = 0, totU = 0;
+  var totP = 0, totU = 0;
 
   for (var m = 1; m <= 12; m++) {
-    var p = (data.allProgs || []).filter(function(x) {
-      var d = toDateObj(getProgDate(x));
-      return d && d.getFullYear() === tahun && d.getMonth() + 1 === m;
-    }).length;
-    var ii = (data.allInsps || []).filter(function(x) {
-      var d = toDateObj(getInspDate(x));
-      return d && d.getFullYear() === tahun && d.getMonth() + 1 === m;
-    }).length;
-    var u = (data.allUps || []).filter(function(x) {
+    var upsBulanIni = (data.allUps || []).filter(function(x) {
       var d = toDateObj(getUpDate(x));
       return d && d.getFullYear() === tahun && d.getMonth() + 1 === m;
-    }).length;
+    });
+    var u = upsBulanIni.length;
+    var p = new Set(upsBulanIni.map(function(x) { return x.no; })).size;
 
     var tProg = (setting.progBulan && setting.progBulan[m]) || 0;
-    var tInsp = (setting.inspBulan && setting.inspBulan[m]) || 0;
-    var total = p + ii + u;
-    totP += p; totI += ii; totU += u;
+    var total = u;
+    totP += p; totU += u;
 
     var nowM = new Date().getMonth() + 1;
     var nowY = new Date().getFullYear();
     var isCurrent = (m === nowM && tahun === nowY);
 
     var statusTxt = '';
-    if (tProg > 0 || tInsp > 0) {
-      var ok = (p >= tProg) && (ii >= tInsp);
+    if (tProg > 0) {
+      var ok = (p >= tProg);
       statusTxt = ok
         ? '<span class="badge ok">✅</span>'
         : '<span class="badge warn">⏳</span>';
@@ -1306,9 +1098,7 @@ function buildBulananTable(data) {
       '<td><b' + (isCurrent ? ' style="color:#16a34a;"' : '') + '>' + BULAN_NAMA[m] + '</b>' +
       (isCurrent ? ' <span class="badge ok" style="font-size:10px;">Bulan ini</span>' : '') + '</td>' +
       '<td style="text-align:center;">' + (tProg > 0 ? tProg : '<span style="color:#d1d5db;">-</span>') + '</td>' +
-      '<td style="text-align:center;">' + (tInsp > 0 ? tInsp : '<span style="color:#d1d5db;">-</span>') + '</td>' +
       '<td style="text-align:center;">' + (p > 0 ? '<span class="badge prog">' + p + '</span>' : '<span style="color:#d1d5db;">0</span>') + '</td>' +
-      '<td style="text-align:center;">' + (ii > 0 ? '<span class="badge insp">' + ii + '</span>' : '<span style="color:#d1d5db;">0</span>') + '</td>' +
       '<td style="text-align:center;">' + (u > 0 ? '<span class="badge up">' + u + '</span>' : '<span style="color:#d1d5db;">0</span>') + '</td>' +
       '<td style="text-align:center;"><b>' + total + '</b></td>' +
       '<td>' + statusTxt + '</td>' +
@@ -1317,11 +1107,10 @@ function buildBulananTable(data) {
 
   html += '<tr style="border-top:2px solid rgba(34,197,94,.25);font-weight:900;">' +
     '<td><b>TOTAL ' + tahun + '</b></td>' +
-    '<td colspan="2"></td>' +
+    '<td></td>' +
     '<td style="text-align:center;"><b>' + totP + '</b></td>' +
-    '<td style="text-align:center;"><b>' + totI + '</b></td>' +
     '<td style="text-align:center;"><b>' + totU + '</b></td>' +
-    '<td style="text-align:center;"><b style="color:#16a34a;">' + (totP + totI + totU) + '</b></td>' +
+    '<td style="text-align:center;"><b style="color:#16a34a;">' + totU + '</b></td>' +
     '<td></td>' +
   '</tr>';
   tbody.innerHTML = html;
@@ -1352,11 +1141,6 @@ function refreshAll() {
     var kpi2 = document.getElementById('kpi2');
     if (kpi2) kpi2.textContent = String(data.pct || 0) + '%';
 
-    var kpi5 = document.getElementById('kpi5');
-    if (kpi5) kpi5.textContent = String(data.inspDone || 0);
-    var kpi5sub = document.getElementById('kpi5sub');
-    if (kpi5sub) kpi5sub.textContent = 'target: ' + (setting.totalInsp || 36) + ' inspeksi';
-
     var kpi3 = document.getElementById('kpi3');
     if (kpi3) kpi3.textContent = String((getLS(KU) || []).length);
 
@@ -1371,8 +1155,7 @@ function refreshAll() {
         'Filter: ' + (filterTahun > 0 ? 'Tahun ' + filterTahun : 'Semua Tahun') +
         (filterBulan > 0 ? ' | Bulan ' + BULAN_NAMA[filterBulan] : '') +
         ' &nbsp;|&nbsp; Program selesai: ' + data.progDone + '/' + (setting.totalProg || 30) +
-        ' &nbsp;|&nbsp; Inspeksi: ' + data.inspDone +
-        ' &nbsp;|&nbsp; Total Actual: ' + data.totalActual;
+        ' &nbsp;|&nbsp; Upload Dokumen: ' + data.uploadCount + '/' + (setting.totalProg || 30);
     }
 
     buildCharts(data);
@@ -1421,40 +1204,6 @@ function safeLoadFromSupabase() {
 function loadFromSupabase() {
   if (!navigator.onLine || !db) { refreshAll(); return Promise.resolve(); }
 
-  var p1 = db.from('inspeksi').select('*').order('created_at', { ascending: false })
-    .then(function(res) {
-      if (res.error) { console.error('inspeksi:', res.error); return; }
-      var incoming = (res.data || []).map(function(x) {
-        return {
-          jenis: x.jenis, tgl: x.tgl, nama: x.nama,
-          lokasi: x.lokasi, unit: x.unit, jam: x.jam,
-          at: x.created_at,
-          checklist: safeParseJSON(x.checklist),
-          fotos: safeParseJSON(x.fotos)
-        };
-      });
-      mergeAndSetLS(KI, incoming, function(r) {
-        return [r.jenis||'', r.tgl||'', r.nama||'', r.lokasi||'', r.unit||'', r.jam||''].join('|');
-      });
-      refreshAll();
-    }).catch(function(e) { console.error(e); });
-
-  var p2 = db.from('program').select('*').order('created_at', { ascending: false })
-    .then(function(res) {
-      if (res.error) { console.error('program:', res.error); return; }
-      var incoming = (res.data || []).map(function(x) {
-        return {
-          no: x.no, title: x.title, at: x.created_at,
-          fields: { nama: x.nama, tgl: x.tgl, catatan: x.catatan },
-          ringkas: x.ringkas
-        };
-      });
-      mergeAndSetLS(KP, incoming, function(r) {
-        return [r.no||'', (r.fields&&r.fields.nama)||'', (r.fields&&r.fields.tgl)||''].join('|');
-      });
-      refreshAll();
-    }).catch(function(e) { console.error(e); });
-
   var p3 = db.from('upload').select('*').order('created_at', { ascending: false })
     .then(function(res) {
       if (res.error) { console.error('upload:', res.error); return; }
@@ -1473,7 +1222,7 @@ function loadFromSupabase() {
       }
     }).catch(function(e) { console.error(e); });
 
-  return Promise.all([p1, p2, p3]);
+  return Promise.all([p3]);
 }
 
 // ============================================================
@@ -1542,7 +1291,31 @@ function resetUpload() {
   fillDateSelects('upTgl', 'upBln', 'upThn');
 }
 
+// Kompres foto (dipakai agar foto upload bisa disimpan & dipakai di lampiran PPT)
+function compressImageFile(file, maxW, maxH, quality) {
+  return new Promise(function(resolve) {
+    var img = new Image();
+    var url = URL.createObjectURL(file);
+    img.onload = function() {
+      var canvas = document.createElement('canvas');
+      var w = img.width, h = img.height;
+      if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+      if (h > maxH) { w = Math.round(w * maxH / h); h = maxH; }
+      canvas.width = w; canvas.height = h;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      var data = canvas.toDataURL('image/jpeg', quality || 0.7);
+      URL.revokeObjectURL(url);
+      resolve(data);
+    };
+    img.onerror = function() { URL.revokeObjectURL(url); resolve(null); };
+    img.src = url;
+  });
+}
+
 // FIX: doUpload — perbaikan anti-double & update localStorage benar
+// Kini menyimpan data gambar (dikompres) agar dapat ditampilkan sebagai
+// lampiran foto dokumentasi implementasi program pada Export PPT.
 function doUpload() {
   var hint  = document.getElementById('upHint');
   var no    = Number(document.getElementById('ddVal').value);
@@ -1557,16 +1330,16 @@ function doUpload() {
 
   hint.textContent = '⏳ Menyimpan...';
 
-  var reader = new FileReader();
-  reader.onload = function(e) {
+  var isImage = file.type && file.type.indexOf('image/') === 0;
+  var photoPromise = isImage ? compressImageFile(file, 900, 900, 0.7) : Promise.resolve(null);
+
+  photoPromise.then(function(photoData) {
     try {
-      // Simpan TANPA data base64 ke localStorage (hemat ruang)
       var rec = {
         no: no, title: TITLES[no],
         at: new Date().toISOString(),
         tglUpload: tglUpload,
-        file: { name: file.name, type: file.type, size: file.size }
-        // data tidak disimpan di localStorage agar tidak overflow
+        file: { name: file.name, type: file.type, size: file.size, data: photoData || null }
       };
 
       var arr = getLS(KU);
@@ -1583,7 +1356,7 @@ function doUpload() {
       arr.unshift(rec);
       setLS(KU, arr.slice(0, 200));
 
-      // Kirim ke Supabase
+      // Kirim ke Supabase (tanpa base64, terlalu besar untuk kolom biasa)
       if (navigator.onLine && db) {
         db.from('upload').insert({
           no: no, title: TITLES[no],
@@ -1602,9 +1375,7 @@ function doUpload() {
       console.error('doUpload error:', err);
       hint.textContent = '❌ Gagal menyimpan: ' + err.message;
     }
-  };
-  reader.onerror = function() { hint.textContent = '❌ Gagal membaca file.'; };
-  reader.readAsDataURL(file);
+  });
 }
 
 // ============================================================
@@ -1639,541 +1410,6 @@ function clearUploads() {
 }
 
 // ============================================================
-// RIWAYAT ASPEK
-// ============================================================
-function renderAspek() {
-  var body = document.getElementById('aspekBody');
-  if (!body) return;
-  var arr = getLS(KP);
-  if (!arr.length) {
-    body.innerHTML = '<tr><td colspan="4" style="color:#9ca3af;padding:16px;text-align:center;">Belum ada submit program.</td></tr>';
-    return;
-  }
-  body.innerHTML = arr.slice(0, 100).map(function(x) {
-    var t = (x.fields && x.fields.tgl) ? x.fields.tgl : (x.at || '');
-    var r = x.ringkas || (x.fields ? (x.fields.nama || x.fields.catatan || '-') : '-');
-    return '<tr>' +
-      '<td style="white-space:nowrap;">' + fmtDateOnly(t) + '</td>' +
-      '<td><span class="badge prog">P' + esc(x.no) + '</span></td>' +
-      '<td style="white-space:normal;max-width:200px;">' + esc(x.title || '-') + '</td>' +
-      '<td style="white-space:normal;">' + esc(r) + '</td>' +
-    '</tr>';
-  }).join('');
-}
-
-// ============================================================
-// RIWAYAT INSPEKSI
-// ============================================================
-function renderRiwayatInspeksi() {
-  var container = document.getElementById('inspRiwayatList');
-  if (!container) return;
-  var arr = getLS(KI);
-  if (!arr.length) {
-    container.innerHTML = '<div class="hint" style="text-align:center;padding:20px;">Belum ada data inspeksi.</div>';
-    return;
-  }
-  var html = '';
-  arr.slice(0, 50).forEach(function(x, idx) {
-    var cl  = x.checklist || [];
-    var ok  = cl.filter(function(c) { return c && (c.kondisi === 'OK' || c.kondisi === 'LENGKAP'); }).length;
-    var nok = cl.filter(function(c) { return c && (c.kondisi === 'NOT OK' || c.kondisi === 'TIDAK LENGKAP' || c.kondisi === 'RUSAK'); }).length;
-    var na  = cl.filter(function(c) { return c && c.kondisi === 'N/A'; }).length;
-    var tglTampil = (x && x.tgl) ? x.tgl : (x && x.at ? x.at : '');
-    var pct = cl.length > 0 ? Math.round(ok / cl.length * 100) : 0;
-
-    html += '<div class="insp-card">';
-    html += '<div class="insp-card-head"><div>';
-    html += '<div class="insp-card-title">' + esc(x.jenis || '-') + '</div>';
-    html += '<div class="insp-card-meta">📅 ' + esc(fmtDateOnly(tglTampil)) +
-            ' &nbsp;👤 ' + esc(x.nama || '-') + '<br>' +
-            '📍 ' + esc(x.lokasi || '-') + ' &nbsp;🏷️ ' + esc(x.unit || '-') + '</div>';
-    html += '<div style="margin-top:6px;">' +
-            '<span class="badge ok">✓ ' + ok + '</span> ' +
-            '<span class="badge notok">✗ ' + nok + '</span> ' +
-            '<span class="badge na">N/A ' + na + '</span> ' +
-            '<span class="badge prog">' + pct + '% OK</span></div>';
-    html += '</div>';
-    html += '<button class="insp-toggle" onclick="toggleDetail(' + idx + ')">Detail ▾</button>';
-    html += '</div>';
-
-    html += '<div class="insp-detail" id="insp-detail-' + idx + '">';
-    if (cl.length) {
-      html += '<div class="tbl-wrap"><table class="chk-table"><thead><tr>' +
-              '<th>No</th><th>Item</th><th>Kondisi</th><th>Catatan</th>' +
-              '</tr></thead><tbody>';
-      cl.forEach(function(c) {
-        if (!c) return;
-        var bc = (c.kondisi === 'OK' || c.kondisi === 'LENGKAP') ? 'ok' :
-                 (c.kondisi === 'N/A' ? 'na' : 'notok');
-        html += '<tr><td>' + esc(c.no) + '</td>' +
-                '<td style="white-space:normal;min-width:140px;">' + esc(c.item) + '</td>' +
-                '<td><span class="badge ' + bc + '">' + esc(c.kondisi) + '</span></td>' +
-                '<td style="white-space:normal;">' + esc(c.catatan || '-') + '</td></tr>';
-      });
-      html += '</tbody></table></div>';
-    }
-    if (x.fotos && Array.isArray(x.fotos) && x.fotos.length) {
-      html += '<div style="margin-top:10px;font-size:11px;font-weight:700;color:#6b7280;margin-bottom:4px;">📸 Foto (' + x.fotos.length + ')</div>';
-      html += '<div class="foto-grid">';
-      x.fotos.forEach(function(f) {
-        if (f && f.data) html += '<div class="foto-card"><img src="' + f.data + '" alt="' + esc(f.name) + '"/><div class="foto-cap">' + esc(f.name) + '</div></div>';
-      });
-      html += '</div>';
-    }
-    html += '</div></div>';
-  });
-  container.innerHTML = html;
-}
-
-function toggleDetail(idx) {
-  var el = document.getElementById('insp-detail-' + idx);
-  if (el) el.classList.toggle('open');
-}
-
-function clearInspeksi() {
-  if (!confirm('Hapus semua riwayat inspeksi di perangkat ini?')) return;
-  setLS(KI, []);
-  renderRiwayatInspeksi();
-  refreshAll();
-  showToast('Semua riwayat inspeksi dihapus.');
-}
-
-// ============================================================
-// FORM INSPEKSI — FIX UTAMA
-// ============================================================
-var inspExtraCounter = 0;
-var inspExtraBlocks  = [];
-
-function renderChecklist() {
-  var jenisEl = document.getElementById('inspJenis');
-  var wrap    = document.getElementById('checklistWrap');
-  var body    = document.getElementById('chkBody');
-  var header  = document.getElementById('chkHeader');
-  if (!jenisEl || !wrap || !body) return;
-  var jenis = jenisEl.value || '';
-  var cfg   = INSP_MAP[jenis];
-  if (!jenis || !cfg) { wrap.style.display = 'none'; body.innerHTML = ''; return; }
-  if (header) header.textContent = cfg.header;
-  wrap.style.display = 'block';
-  var html = '';
-  (cfg.items || []).forEach(function(item, idx) {
-    var opts = (cfg.opts || []).map(function(o) {
-      return '<option value="' + esc(o) + '">' + esc(o) + '</option>';
-    }).join('');
-    html += '<tr><td>' + (idx + 1) + '</td>' +
-            '<td style="white-space:normal;min-width:140px;">' + esc(item) + '</td>' +
-            '<td><select class="form-select" id="ck_' + idx + '" style="padding:6px 8px;font-size:12px;">' + opts + '</select></td>' +
-            '<td><input type="text" id="cn_' + idx + '" placeholder="Catatan" style="padding:6px 8px;font-size:12px;"/></td></tr>';
-  });
-  body.innerHTML = html;
-}
-
-function addInspBlock() {
-  var jenisEl = document.getElementById('inspJenis');
-  var cont    = document.getElementById('inspBlocks');
-  if (!jenisEl || !cont) return;
-  var jenis = jenisEl.value || '';
-  if (!jenis) { showToast('Pilih Jenis Inspeksi dulu!', 'error'); return; }
-  if (!INSP_MAP[jenis]) { showToast('Jenis inspeksi tidak valid.', 'error'); return; }
-
-  inspExtraCounter++;
-  var N = inspExtraCounter;
-  inspExtraBlocks.push(N);
-
-  var wrap = document.createElement('div');
-  wrap.className = 'insp-card';
-  wrap.id = 'inspBlockExtra-' + N;
-  wrap.style.marginTop = '14px';
-  wrap.innerHTML =
-    '<div class="insp-card-head"><div>' +
-    '<div class="insp-card-title">Blok Inspeksi Tambahan #' + N + '</div>' +
-    '<div class="insp-card-meta">Checklist & Foto temuan tambahan</div>' +
-    '</div><button class="btn danger sm" type="button" onclick="removeInspBlockExtra(' + N + ')">Hapus</button></div>' +
-    '<div class="form-group" style="margin-top:10px;">' +
-    '<label class="form-label">📸 Upload Foto #' + N + '</label>' +
-    '<input type="file" accept="image/*" multiple id="inspFotoExtra_' + N + '" onchange="previewFotoExtra(' + N + ')"/>' +
-    '<div class="foto-grid" id="fotoPreviewExtra_' + N + '"></div></div>' +
-    '<div style="margin-top:12px;">' +
-    '<b style="font-size:13px;display:block;margin-bottom:6px;">Checklist Tambahan #' + N + '</b>' +
-    '<div class="tbl-wrap"><table class="chk-table">' +
-    '<thead><tr><th style="width:36px">No</th><th>Item</th><th style="width:140px">Kondisi</th><th style="width:160px">Catatan</th></tr></thead>' +
-    '<tbody id="chkBodyExtra_' + N + '"></tbody></table></div></div>';
-  cont.appendChild(wrap);
-  renderChecklistExtraBlock(N);
-}
-
-function renderChecklistExtraBlock(N) {
-  var jenisEl = document.getElementById('inspJenis');
-  if (!jenisEl) return;
-  var jenis = jenisEl.value || '';
-  var cfg   = INSP_MAP[jenis];
-  if (!cfg) return;
-  var body = document.getElementById('chkBodyExtra_' + N);
-  if (!body) return;
-  var html = '';
-  (cfg.items || []).forEach(function(item, idx) {
-    var opts = (cfg.opts || []).map(function(o) {
-      return '<option value="' + esc(o) + '">' + esc(o) + '</option>';
-    }).join('');
-    html += '<tr><td>' + (idx + 1) + '</td>' +
-            '<td style="white-space:normal;min-width:140px;">' + esc(item) + '</td>' +
-            '<td><select class="form-select" id="ckExtra_' + N + '_' + idx + '" style="padding:6px 8px;font-size:12px;">' + opts + '</select></td>' +
-            '<td><input type="text" id="cnExtra_' + N + '_' + idx + '" placeholder="Catatan" style="padding:6px 8px;font-size:12px;"/></td></tr>';
-  });
-  body.innerHTML = html;
-}
-
-function removeInspBlockExtra(N) {
-  inspExtraBlocks = inspExtraBlocks.filter(function(x) { return x !== N; });
-  var el = document.getElementById('inspBlockExtra-' + N);
-  if (el) el.remove();
-}
-
-function previewFoto() {
-  var input = document.getElementById('inspFoto');
-  var grid  = document.getElementById('fotoPreview');
-  if (!input || !grid) return;
-  grid.innerHTML = '';
-  Array.from(input.files || []).slice(0, 6).forEach(function(file) {
-    var r = new FileReader();
-    r.onload = function(e) {
-      var card = document.createElement('div');
-      card.className = 'foto-card';
-      card.innerHTML = '<img src="' + e.target.result + '" alt="' + esc(file.name) + '"/><div class="foto-cap">' + esc(file.name) + '</div>';
-      grid.appendChild(card);
-    };
-    r.readAsDataURL(file);
-  });
-}
-
-function previewFotoExtra(N) {
-  var input = document.getElementById('inspFotoExtra_' + N);
-  var grid  = document.getElementById('fotoPreviewExtra_' + N);
-  if (!input || !grid) return;
-  grid.innerHTML = '';
-  Array.from(input.files || []).slice(0, 6).forEach(function(file) {
-    var r = new FileReader();
-    r.onload = function(e) {
-      var card = document.createElement('div');
-      card.className = 'foto-card';
-      card.innerHTML = '<img src="' + e.target.result + '" alt="' + esc(file.name) + '"/><div class="foto-cap">' + esc(file.name) + '</div>';
-      grid.appendChild(card);
-    };
-    r.readAsDataURL(file);
-  });
-}
-
-function resetInsp() {
-  ['inspNama','inspLokasi','inspUnit'].forEach(function(id) {
-    var el = document.getElementById(id); if (el) el.value = '';
-  });
-  var jenisEl = document.getElementById('inspJenis'); if (jenisEl) jenisEl.value = '';
-  var jamEl   = document.getElementById('inspJam');   if (jamEl) jamEl.value = '';
-  var fotoEl  = document.getElementById('inspFoto');  if (fotoEl) fotoEl.value = '';
-  var preview = document.getElementById('fotoPreview'); if (preview) preview.innerHTML = '';
-  var chkBody = document.getElementById('chkBody');   if (chkBody) chkBody.innerHTML = '';
-  var wrap    = document.getElementById('checklistWrap'); if (wrap) wrap.style.display = 'none';
-  var cont    = document.getElementById('inspBlocks'); if (cont) cont.innerHTML = '';
-  var hint    = document.getElementById('inspHint');
-  if (hint) hint.textContent = 'Form direset. Pilih jenis inspeksi untuk memulai.';
-  inspExtraCounter = 0;
-  inspExtraBlocks  = [];
-  fillDateSelects('inspTgl', 'inspBln', 'inspThn');
-}
-
-// FIX UTAMA: submitInsp — async/await dengan error handling proper
-function submitInsp() {
-  var hint = document.getElementById('inspHint');
-
-  // Ambil semua nilai form
-  var jenis  = (document.getElementById('inspJenis')  || {}).value || '';
-  var nama   = ((document.getElementById('inspNama')  || {}).value || '').trim();
-  var lokasi = ((document.getElementById('inspLokasi')|| {}).value || '').trim();
-  var unit   = ((document.getElementById('inspUnit')  || {}).value || '').trim();
-  var jam    = (document.getElementById('inspJam')    || {}).value || '';
-  var tgl    = getDateFromSelects('inspTgl', 'inspBln', 'inspThn');
-
-  // Validasi
-  if (!jenis)  { if (hint) hint.textContent = '❌ Pilih jenis inspeksi dulu.'; showToast('Pilih jenis inspeksi!', 'error'); return; }
-  if (!tgl)    { if (hint) hint.textContent = '❌ Pilih tanggal inspeksi dulu.'; showToast('Pilih tanggal!', 'error'); return; }
-  if (!nama)   { if (hint) hint.textContent = '❌ Isi nama inspektor dulu.'; showToast('Isi nama inspektor!', 'error'); return; }
-
-  if (hint) hint.textContent = '⏳ Menyimpan data inspeksi...';
-
-  var blockIds = [0].concat(Array.isArray(inspExtraBlocks) ? inspExtraBlocks : []);
-
-  // Helper: baca foto sebagai base64
-  function readFotosAsync(inputEl, maxFotos) {
-    return new Promise(function(resolve) {
-      var files = inputEl && inputEl.files ? Array.from(inputEl.files).slice(0, maxFotos || 6) : [];
-      if (!files.length) return resolve([]);
-      var results = [];
-      var count   = 0;
-      files.forEach(function(file) {
-        // Kompres jika gambar terlalu besar
-        if (file.size > 1024 * 1024 && file.type.startsWith('image/')) {
-          var img = new Image();
-          var url = URL.createObjectURL(file);
-          img.onload = function() {
-            var canvas = document.createElement('canvas');
-            var maxW = 800, maxH = 800;
-            var w = img.width, h = img.height;
-            if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
-            if (h > maxH) { w = Math.round(w * maxH / h); h = maxH; }
-            canvas.width = w; canvas.height = h;
-            var ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, w, h);
-            var data = canvas.toDataURL('image/jpeg', 0.7);
-            URL.revokeObjectURL(url);
-            results.push({ name: file.name, type: 'image/jpeg', data: data });
-            count++;
-            if (count === files.length) resolve(results);
-          };
-          img.onerror = function() {
-            URL.revokeObjectURL(url);
-            count++;
-            if (count === files.length) resolve(results);
-          };
-          img.src = url;
-        } else {
-          var reader = new FileReader();
-          reader.onload = function(e) {
-            results.push({ name: file.name, type: file.type, data: e.target.result });
-            count++;
-            if (count === files.length) resolve(results);
-          };
-          reader.onerror = function() {
-            count++;
-            if (count === files.length) resolve(results);
-          };
-          reader.readAsDataURL(file);
-        }
-      });
-    });
-  }
-
-  function collectChecklist(blockId) {
-    var cfg = INSP_MAP[jenis] || { items: [] };
-    var checklist = [];
-    (cfg.items || []).forEach(function(item, idx) {
-      var sel, inp;
-      if (blockId === 0) {
-        sel = document.getElementById('ck_'  + idx);
-        inp = document.getElementById('cn_'  + idx);
-      } else {
-        sel = document.getElementById('ckExtra_' + blockId + '_' + idx);
-        inp = document.getElementById('cnExtra_' + blockId + '_' + idx);
-      }
-      checklist.push({
-        no: idx + 1,
-        item: item,
-        kondisi: sel ? sel.value : '',
-        catatan: inp ? inp.value : ''
-      });
-    });
-    return checklist;
-  }
-
-  // Jalankan async
-  (function() {
-    var chain = Promise.resolve();
-    var savedCount = 0;
-
-    blockIds.forEach(function(blockId) {
-      chain = chain.then(function() {
-        var checklist = collectChecklist(blockId);
-        var inputEl = blockId === 0
-          ? document.getElementById('inspFoto')
-          : document.getElementById('inspFotoExtra_' + blockId);
-
-        return readFotosAsync(inputEl, 6).then(function(fotos) {
-          var rec = {
-            jenis: jenis, tgl: tgl, nama: nama,
-            lokasi: lokasi, unit: unit, jam: jam,
-            at: new Date().toISOString(),
-            checklist: checklist,
-            fotos: fotos
-          };
-
-          // Simpan ke localStorage
-          var arr = getLS(KI);
-          arr.unshift(rec);
-          setLS(KI, arr.slice(0, 100));
-          savedCount++;
-
-          // Kirim ke Supabase (non-blocking)
-          if (navigator.onLine && db) {
-            db.from('inspeksi').insert({
-              jenis: jenis, tgl: tgl, nama: nama,
-              lokasi: lokasi, unit: unit, jam: jam,
-              checklist: JSON.stringify(checklist),
-              fotos: JSON.stringify(fotos.map(function(f) {
-                return { name: f.name, type: f.type };
-                // Tidak kirim data base64 ke Supabase (terlalu besar)
-              }))
-            }).catch(function(e) { console.error('Supabase insert inspeksi:', e); });
-          }
-        });
-      });
-    });
-
-    chain.then(function() {
-      // Semua blok tersimpan
-      refreshAll();
-      showToast('✅ ' + savedCount + ' inspeksi ' + jenis + ' tersimpan!');
-      if (hint) hint.textContent = '✅ ' + savedCount + ' record inspeksi tersimpan! Kembali ke dashboard...';
-
-      setTimeout(function() {
-        navigate('dashboard');
-        refreshAll();
-      }, 800);
-
-    }).catch(function(e) {
-      console.error('submitInsp error:', e);
-      if (hint) hint.textContent = '❌ Gagal menyimpan: ' + (e.message || 'Unknown error');
-      showToast('Gagal menyimpan inspeksi!', 'error');
-    });
-  })();
-}
-
-// ============================================================
-// PROGRAM
-// ============================================================
-var selProg = null;
-
-function renderProgGrid() {
-  var grid = document.getElementById('progGrid');
-  if (!grid) return;
-  grid.innerHTML = '';
-  var doneSet = new Set(getLS(KP).map(function(x) { return x.no; }));
-  // Tambah dari inspeksi
-  getLS(KI).forEach(function(i) {
-    Object.keys(PROG_INSPEKSI).forEach(function(n) {
-      if (i.jenis === PROG_INSPEKSI[Number(n)]) doneSet.add(Number(n));
-    });
-  });
-
-  for (var i = 1; i <= 30; i++) {
-    (function(n) {
-      var isDone = doneSet.has(n);
-      var btn = document.createElement('button');
-      btn.className = 'prog-btn' + (selProg === n ? ' active' : '') + (isDone ? ' done' : '');
-      btn.innerHTML = '<b>' + n + '. ' + (isDone ? '✅ ' : '') +
-        esc(TITLES[n].slice(0, 28)) + (TITLES[n].length > 28 ? '…' : '') + '</b>';
-      btn.addEventListener('click', function() {
-        selProg = n;
-        renderProgGrid();
-        renderProgForm(n);
-      });
-      grid.appendChild(btn);
-    })(i);
-  }
-}
-
-function renderProgForm(no) {
-  var doneSet = new Set(getLS(KP).map(function(x) { return x.no; }));
-  var isDone  = doneSet.has(no);
-  var html =
-    '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px;">' +
-    '<div><b style="font-size:14px;">Program ' + no + '</b>' +
-    '<div class="hint" style="margin-top:4px;">' + esc(TITLES[no]) + '</div></div>' +
-    (isDone ? '<span class="badge ok">✅ Selesai</span>' : '<span class="badge warn">⏳ Belum</span>') +
-    '</div>' +
-    '<div class="grid2">' +
-    '<div class="form-group"><label class="form-label">Nama / Keterangan</label>' +
-    '<input type="text" id="pf_nama" placeholder="Nama atau keterangan pelaksana"/></div>' +
-    '<div class="form-group"><label class="form-label">Tanggal Pelaksanaan</label>' +
-    '<div class="date-selects">' +
-    '<select id="pf_tgl_d" class="form-select" style="flex:1;min-width:70px;"></select>' +
-    '<select id="pf_tgl_m" class="form-select" style="flex:1;min-width:100px;"></select>' +
-    '<select id="pf_tgl_y" class="form-select" style="flex:1;min-width:80px;"></select>' +
-    '</div></div>' +
-    '</div>' +
-    '<div class="form-group"><label class="form-label">Catatan / Ringkasan Kegiatan</label>' +
-    '<textarea id="pf_catatan" rows="3" placeholder="Tulis ringkasan kegiatan..."></textarea></div>';
-
-  if (no === 11 || no === 5 || no === 20) {
-    html += '<div class="hint" style="background:rgba(34,197,94,.08);padding:10px;border-radius:8px;margin-bottom:10px;">' +
-      '💡 Program ini terhubung dengan Form Inspeksi (' + (PROG_INSPEKSI[no] || '') + ').</div>' +
-      '<div class="btnrow" style="margin-bottom:10px;">' +
-      '<button class="btn info sm" onclick="navigate(\'inspeksi\')">📝 Buka Form Inspeksi</button></div>';
-  }
-
-  html +=
-    '<div class="btnrow">' +
-    '<button class="btn primary" onclick="saveProg(' + no + ')" style="flex:1;">✅ Simpan Program ' + no + '</button>' +
-    '<button class="btn danger" onclick="resetProg()">Reset</button>' +
-    '</div>' +
-    '<div class="hint" id="pf_hint" style="margin-top:8px;"></div>';
-
-  document.getElementById('progForm').innerHTML = html;
-  fillDateSelects('pf_tgl_d', 'pf_tgl_m', 'pf_tgl_y');
-  setTimeout(function() {
-    var pf = document.getElementById('progForm');
-    if (pf) pf.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 100);
-}
-
-function resetProg() {
-  var el;
-  el = document.getElementById('pf_nama');    if (el) el.value = '';
-  el = document.getElementById('pf_catatan'); if (el) el.value = '';
-  fillDateSelects('pf_tgl_d', 'pf_tgl_m', 'pf_tgl_y');
-  var h = document.getElementById('pf_hint'); if (h) h.textContent = 'Form direset.';
-}
-
-function saveProg(no) {
-  var hint    = document.getElementById('pf_hint');
-  var nama    = ((document.getElementById('pf_nama')    || {}).value || '').trim();
-  var catatan = ((document.getElementById('pf_catatan') || {}).value || '').trim();
-  var tgl     = getDateFromSelects('pf_tgl_d', 'pf_tgl_m', 'pf_tgl_y') || '';
-
-  if (!nama && !catatan) {
-    if (hint) hint.textContent = '❌ Isi minimal nama atau catatan.';
-    return;
-  }
-
-  var ringkas = nama
-    ? nama + (tgl ? ' — ' + fmtDateOnly(tgl) : '')
-    : catatan.slice(0, 60);
-
-  var rec = {
-    no: no, title: TITLES[no],
-    at: new Date().toISOString(),
-    fields: { nama: nama, tgl: tgl, catatan: catatan },
-    ringkas: ringkas
-  };
-
-  var arr = getLS(KP);
-  var sig = no + '|' + nama + '|' + tgl;
-  if (arr.some(function(x) {
-    return (x.no + '|' + (x.fields && x.fields.nama || '') + '|' + (x.fields && x.fields.tgl || '')) === sig;
-  })) {
-    if (hint) hint.textContent = '⚠️ Data ini sudah tersimpan (anti-double).';
-    refreshAll();
-    return;
-  }
-
-  arr.unshift(rec);
-  setLS(KP, arr.slice(0, 300));
-
-  if (navigator.onLine && db) {
-    db.from('program').insert({
-      no: no, title: TITLES[no],
-      nama: nama, tgl: tgl || null,
-      catatan: catatan, ringkas: ringkas
-    }).then(function(res) {
-      if (res && res.error) console.error('program supabase:', res.error);
-    }).catch(function(e) { console.error(e); });
-  }
-
-  if (hint) hint.textContent = '✅ Program ' + no + ' tersimpan! Tanggal: ' + (tgl ? fmtDateOnly(tgl) : '-');
-  showToast('Program ' + no + ' berhasil disimpan!');
-  refreshAll();
-  setTimeout(renderProgGrid, 300);
-}
-
-// ============================================================
 // SETTING TARGET
 // ============================================================
 function initSetting() {
@@ -2197,9 +1433,7 @@ function renderSettingTable() {
 
   // Total
   var totProgEl = document.getElementById('settingTotalProg');
-  var totInspEl = document.getElementById('settingTotalInsp');
   if (totProgEl) totProgEl.value = setting.totalProg || 30;
-  if (totInspEl) totInspEl.value = setting.totalInsp || 36;
 
   // Grid Target Program per Bulan
   var pgGrid = document.getElementById('targetProgGrid');
@@ -2216,21 +1450,6 @@ function renderSettingTable() {
     pgGrid.innerHTML = html;
   }
 
-  // Grid Target Inspeksi per Bulan
-  var igGrid = document.getElementById('targetInspGrid');
-  if (igGrid) {
-    var html2 = '';
-    for (var m2 = 1; m2 <= 12; m2++) {
-      var val2 = (setting.inspBulan && setting.inspBulan[m2]) || 0;
-      html2 += '<div class="target-card" style="background:rgba(59,130,246,.05);border-color:rgba(59,130,246,.15);">' +
-        '<div class="tc-label" style="color:#1d4ed8;">' + BULAN_NAMA[m2] + '</div>' +
-        '<input type="number" id="tInsp_' + m2 + '" value="' + val2 + '" min="0" max="100" ' +
-        'placeholder="0" style="text-align:center;font-weight:700;"/>' +
-        '</div>';
-    }
-    igGrid.innerHTML = html2;
-  }
-
   renderSettingPreview(setting, tahun);
 }
 
@@ -2238,22 +1457,16 @@ function saveSetting() {
   var hint     = document.getElementById('settingHint');
   var tahun    = Number((document.getElementById('settingTahun') || {}).value || new Date().getFullYear());
   var totProg  = Number((document.getElementById('settingTotalProg') || {}).value || 30);
-  var totInsp  = Number((document.getElementById('settingTotalInsp') || {}).value || 36);
 
   var progBulan = {};
-  var inspBulan = {};
   for (var m = 1; m <= 12; m++) {
     var pEl = document.getElementById('tProg_' + m);
-    var iEl = document.getElementById('tInsp_' + m);
     progBulan[m] = pEl ? Number(pEl.value) || 0 : 0;
-    inspBulan[m] = iEl ? Number(iEl.value) || 0 : 0;
   }
 
   var setting = {
     totalProg: totProg,
-    totalInsp: totInsp,
     progBulan: progBulan,
-    inspBulan: inspBulan,
     updatedAt: new Date().toISOString()
   };
 
@@ -2266,7 +1479,7 @@ function saveSetting() {
 
 function resetSetting() {
   if (!confirm('Reset setting ke default?')) return;
-  var def = { totalProg: 30, totalInsp: 36, progBulan: {}, inspBulan: {} };
+  var def = { totalProg: 30, progBulan: {} };
   setObjLS(KT, def);
   renderSettingTable();
   refreshAll();
@@ -2276,37 +1489,30 @@ function resetSetting() {
 function renderSettingPreview(setting, tahun) {
   var tbody = document.getElementById('settingPreviewBody');
   if (!tbody) return;
-  var allProgs = getLS(KP);
-  var allInsps = getLS(KI);
+  var allUps = getLS(KU);
   var html = '';
 
   for (var m = 1; m <= 12; m++) {
     var tProg = (setting.progBulan && setting.progBulan[m]) || 0;
-    var tInsp = (setting.inspBulan && setting.inspBulan[m]) || 0;
 
-    var aProg = allProgs.filter(function(x) {
-      var d = toDateObj(getProgDate(x));
+    var upsBulanIni = allUps.filter(function(x) {
+      var d = toDateObj(getUpDate(x));
       return d && d.getFullYear() === tahun && d.getMonth() + 1 === m;
-    }).length;
-
-    var aInsp = allInsps.filter(function(x) {
-      var d = toDateObj(getInspDate(x));
-      return d && d.getFullYear() === tahun && d.getMonth() + 1 === m;
-    }).length;
+    });
+    var aProg = new Set(upsBulanIni.map(function(x) { return x.no; })).size;
 
     var pctP = tProg > 0 ? Math.round(aProg / tProg * 100) : (aProg > 0 ? 100 : 0);
-    var pctI = tInsp > 0 ? Math.round(aInsp / tInsp * 100) : (aInsp > 0 ? 100 : 0);
 
     var nowM = new Date().getMonth() + 1;
     var nowY = new Date().getFullYear();
     var isCurrent = (m === nowM && tahun === nowY);
 
     var statusBadge = '';
-    if (tProg > 0 || tInsp > 0) {
-      var allMet = (aProg >= tProg || tProg === 0) && (aInsp >= tInsp || tInsp === 0);
+    if (tProg > 0) {
+      var allMet = (aProg >= tProg);
       statusBadge = allMet
         ? '<span class="badge ok">✅ Tercapai</span>'
-        : (aProg > 0 || aInsp > 0)
+        : (aProg > 0)
           ? '<span class="badge warn">⏳ Proses</span>'
           : '<span class="badge na">—</span>';
     }
@@ -2316,9 +1522,6 @@ function renderSettingPreview(setting, tahun) {
       '<td style="text-align:center;">' + (tProg || '—') + '</td>' +
       '<td style="text-align:center;">' + (aProg > 0 ? '<span class="badge prog">' + aProg + '</span>' : '0') + '</td>' +
       '<td style="text-align:center;"><b>' + pctP + '%</b></td>' +
-      '<td style="text-align:center;">' + (tInsp || '—') + '</td>' +
-      '<td style="text-align:center;">' + (aInsp > 0 ? '<span class="badge insp">' + aInsp + '</span>' : '0') + '</td>' +
-      '<td style="text-align:center;"><b>' + pctI + '%</b></td>' +
       '<td>' + statusBadge + '</td>' +
     '</tr>';
   }
@@ -2397,37 +1600,36 @@ function exportPPT() {
 
     var kpiData = [
       { label: 'Program Selesai', val: data.progDone + ' / ' + (setting.totalProg || 30), color: C_GREEN, icon: '✅' },
-      { label: 'Pencapaian',      val: data.pct + '%',        color: C_BLUE,   icon: '📈' },
-      { label: 'Total Inspeksi',  val: data.inspDone,         color: C_PURPLE, icon: '🔍' },
+      { label: 'Pencapaian (Upload vs Target)', val: data.pct + '%',        color: C_BLUE,   icon: '📈' },
       { label: 'Upload Dokumen',  val: (getLS(KU)||[]).length, color: C_ORANGE, icon: '📁' }
     ];
 
     kpiData.forEach(function(k, i) {
-      var x = 0.3 + (i * 2.9);
+      var x = 0.3 + (i * 3.8);
       s2.addShape(pptx.ShapeType.roundRect, {
-        x: x, y: 1.0, w: 2.7, h: 1.6,
+        x: x, y: 1.0, w: 3.6, h: 1.6,
         fill: { color: C_WHITE },
         line: { color: k.color, width: 2 },
         rectRadius: 0.1
       });
-      s2.addText(k.icon, { x: x, y: 1.05, w: 2.7, h: 0.5, fontSize: 20, align: 'center' });
+      s2.addText(k.icon, { x: x, y: 1.05, w: 3.6, h: 0.5, fontSize: 20, align: 'center' });
       s2.addText(String(k.val), {
-        x: x, y: 1.55, w: 2.7, h: 0.55,
+        x: x, y: 1.55, w: 3.6, h: 0.55,
         fontSize: 26, bold: true, color: k.color, align: 'center'
       });
       s2.addText(k.label, {
-        x: x, y: 2.1, w: 2.7, h: 0.4,
+        x: x, y: 2.1, w: 3.6, h: 0.4,
         fontSize: 10, color: C_GRAY, align: 'center', bold: true
       });
     });
 
     // Progress bar visual
-    s2.addText('📈 Pencapaian Total Program', {
-      x: 0.3, y: 2.8, w: 6, h: 0.35,
+    s2.addText('📈 Pencapaian Total (Upload Dokumen vs Target Program)', {
+      x: 0.3, y: 2.8, w: 8, h: 0.35,
       fontSize: 12, bold: true, color: C_DARK
     });
     s2.addText(data.pct + '%', {
-      x: 6.3, y: 2.8, w: 5.5, h: 0.35,
+      x: 8.3, y: 2.8, w: 3.5, h: 0.35,
       fontSize: 12, bold: true, color: C_GREEN, align: 'right'
     });
     // Track
@@ -2436,7 +1638,7 @@ function exportPPT() {
     var fillW = Math.max(0.1, 11.4 * (data.pct / 100));
     s2.addShape(pptx.ShapeType.rect, { x: 0.3, y: 3.2, w: fillW, h: 0.25, fill: { color: C_GREEN }, line: { color: C_GREEN } });
 
-    s2.addText('Filter: ' + bulanStr + ' | Program: ' + data.progDone + '/' + (setting.totalProg||30) + ' | Inspeksi: ' + data.inspDone + ' | Upload: ' + (getLS(KU)||[]).length, {
+    s2.addText('Filter: ' + bulanStr + ' | Program: ' + data.progDone + '/' + (setting.totalProg||30) + ' | Upload: ' + (getLS(KU)||[]).length + '/' + (setting.totalProg||30), {
       x: 0.3, y: 3.6, w: 11.4, h: 0.35,
       fontSize: 10, color: C_GRAY, italic: true
     });
@@ -2454,52 +1656,42 @@ function exportPPT() {
         { text: 'Kategori',       options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 10 } },
         { text: 'Target',         options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 10, align: 'center' } },
         { text: 'Selesai',        options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 10, align: 'center' } },
-        { text: 'Inspeksi',       options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 10, align: 'center' } },
-        { text: 'Total Actual',   options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 10, align: 'center' } },
         { text: '% Pencapaian',   options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 10, align: 'center' } },
         { text: 'Status',         options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 10, align: 'center' } }
       ]
     ];
 
-    var totT = 0, totS = 0, totI2 = 0, totA = 0;
+    var totT = 0, totS = 0;
     Object.keys(KATEGORI).forEach(function(kat) {
       var nos     = KATEGORI[kat];
       var target  = nos.length;
       var selesai = nos.filter(function(n) { return data.doneSet.has(n); }).length;
-      var inspKat = data.insps.filter(function(i) {
-        return nos.some(function(n) { return PROG_INSPEKSI[n] && i.jenis === PROG_INSPEKSI[n]; });
-      }).length;
-      var actual = selesai + inspKat;
-      var pct    = target > 0 ? Math.round(actual / (target * 2) * 100) : 0;
+      var pct    = target > 0 ? Math.round(selesai / target * 100) : 0;
       var status = pct >= 100 ? '✅ Tercapai' : pct >= 50 ? '⏳ Proses' : '❌ Kurang';
       var rowFill = pct >= 100 ? 'dcfce7' : pct >= 50 ? 'fef9c3' : 'fee2e2';
-      totT += target; totS += selesai; totI2 += inspKat; totA += actual;
+      totT += target; totS += selesai;
 
       tblRows.push([
         { text: kat,             options: { bold: true, fontSize: 9, fill: rowFill } },
         { text: String(target),  options: { align: 'center', fontSize: 9, fill: rowFill } },
         { text: String(selesai), options: { align: 'center', fontSize: 9, fill: rowFill, color: '15803d', bold: true } },
-        { text: String(inspKat), options: { align: 'center', fontSize: 9, fill: rowFill, color: '1d4ed8', bold: true } },
-        { text: String(actual),  options: { align: 'center', fontSize: 9, fill: rowFill, bold: true } },
         { text: pct + '%',       options: { align: 'center', fontSize: 9, fill: rowFill, bold: true } },
         { text: status,          options: { align: 'center', fontSize: 9, fill: rowFill, bold: true } }
       ]);
     });
 
-    var totPct2 = totT > 0 ? Math.round(totA / (totT * 2) * 100) : 0;
+    var totPct2 = totT > 0 ? Math.round(totS / totT * 100) : 0;
     tblRows.push([
       { text: 'TOTAL', options: { bold: true, fontSize: 10, fill: 'bbf7d0', color: C_DARK } },
       { text: String(totT), options: { align: 'center', bold: true, fontSize: 10, fill: 'bbf7d0' } },
       { text: String(totS), options: { align: 'center', bold: true, fontSize: 10, fill: 'bbf7d0', color: '15803d' } },
-      { text: String(totI2), options: { align: 'center', bold: true, fontSize: 10, fill: 'bbf7d0', color: '1d4ed8' } },
-      { text: String(totA), options: { align: 'center', bold: true, fontSize: 10, fill: 'bbf7d0' } },
       { text: totPct2 + '%', options: { align: 'center', bold: true, fontSize: 11, fill: 'bbf7d0', color: C_GREEN } },
       { text: '', options: { fill: 'bbf7d0' } }
     ]);
 
     s3.addTable(tblRows, {
       x: 0.3, y: 0.9, w: 11.4,
-      colW: [2.4, 0.9, 0.9, 0.9, 1.2, 1.2, 1.2],
+      colW: [4.4, 1.5, 1.5, 2.0, 2.0],
       border: { type: 'solid', color: 'd1d5db', pt: 0.5 },
       autoPage: false
     });
@@ -2515,9 +1707,7 @@ function exportPPT() {
     var tblBulan = [[
       { text: 'Bulan',         options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9 } },
       { text: 'Tgt Prog',      options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9, align: 'center' } },
-      { text: 'Tgt Insp',      options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9, align: 'center' } },
-      { text: 'Prog Submit',   options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9, align: 'center' } },
-      { text: 'Inspeksi',      options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9, align: 'center' } },
+      { text: 'Prog Tercapai', options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9, align: 'center' } },
       { text: 'Upload Dok',    options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9, align: 'center' } },
       { text: 'Total',         options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9, align: 'center' } },
       { text: 'Status',        options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9, align: 'center' } }
@@ -2528,33 +1718,24 @@ function exportPPT() {
 
     for (var m = 1; m <= 12; m++) {
       var tProg2 = (setting.progBulan && setting.progBulan[m]) || 0;
-      var tInsp2 = (setting.inspBulan && setting.inspBulan[m]) || 0;
-      var p2 = (data.allProgs||[]).filter(function(x) {
-        var d = toDateObj(getProgDate(x));
-        return d && d.getFullYear() === tahun && d.getMonth() + 1 === m;
-      }).length;
-      var ii2 = (data.allInsps||[]).filter(function(x) {
-        var d = toDateObj(getInspDate(x));
-        return d && d.getFullYear() === tahun && d.getMonth() + 1 === m;
-      }).length;
-      var u2 = (data.allUps||[]).filter(function(x) {
+      var upsBulanIni2 = (data.allUps||[]).filter(function(x) {
         var d = toDateObj(getUpDate(x));
         return d && d.getFullYear() === tahun && d.getMonth() + 1 === m;
-      }).length;
-      var tot2 = p2 + ii2 + u2;
+      });
+      var p2 = new Set(upsBulanIni2.map(function(x) { return x.no; })).size;
+      var u2 = upsBulanIni2.length;
+      var tot2 = u2;
       var isCur = (m === nowM2 && tahun === nowY2);
       var rowFill2 = isCur ? 'dcfce7' : (m % 2 === 0 ? 'f9fafb' : C_WHITE);
-      var metTarget = (tProg2 === 0 || p2 >= tProg2) && (tInsp2 === 0 || ii2 >= tInsp2);
-      var statusStr = (tProg2 > 0 || tInsp2 > 0)
-        ? (metTarget ? '✅' : (p2 > 0 || ii2 > 0 ? '⏳' : '—'))
+      var metTarget = (tProg2 === 0 || p2 >= tProg2);
+      var statusStr = (tProg2 > 0)
+        ? (metTarget ? '✅' : (p2 > 0 ? '⏳' : '—'))
         : '';
 
       tblBulan.push([
         { text: BULAN_NAMA[m] + (isCur ? ' ◀' : ''), options: { bold: isCur, fontSize: 9, fill: rowFill2 } },
         { text: tProg2 > 0 ? String(tProg2) : '—', options: { align: 'center', fontSize: 9, fill: rowFill2 } },
-        { text: tInsp2 > 0 ? String(tInsp2) : '—', options: { align: 'center', fontSize: 9, fill: rowFill2 } },
         { text: String(p2),   options: { align: 'center', fontSize: 9, fill: rowFill2, color: p2 > 0 ? '15803d' : C_GRAY, bold: p2 > 0 } },
-        { text: String(ii2),  options: { align: 'center', fontSize: 9, fill: rowFill2, color: ii2 > 0 ? '1d4ed8' : C_GRAY, bold: ii2 > 0 } },
         { text: String(u2),   options: { align: 'center', fontSize: 9, fill: rowFill2, color: u2 > 0 ? '7c3aed' : C_GRAY, bold: u2 > 0 } },
         { text: String(tot2), options: { align: 'center', fontSize: 9, fill: rowFill2, bold: true } },
         { text: statusStr,    options: { align: 'center', fontSize: 9, fill: rowFill2 } }
@@ -2563,7 +1744,7 @@ function exportPPT() {
 
     s4.addTable(tblBulan, {
       x: 0.3, y: 0.9, w: 11.4,
-      colW: [1.6, 0.9, 0.9, 1.3, 1.1, 1.2, 1.0, 0.9],
+      colW: [2.0, 1.5, 2.0, 2.0, 1.9, 2.0],
       border: { type: 'solid', color: 'd1d5db', pt: 0.5 },
       autoPage: false
     });
@@ -2576,19 +1757,15 @@ function exportPPT() {
       x: 0.3, y: 0.1, w: 11, h: 0.6, fontSize: 16, bold: true, color: C_WHITE
     });
 
-    var doneSetFull = new Set(getLS(KP).map(function(x) { return x.no; }));
-    getLS(KI).forEach(function(i) {
-      Object.keys(PROG_INSPEKSI).forEach(function(n) {
-        if (i.jenis === PROG_INSPEKSI[Number(n)]) doneSetFull.add(Number(n));
-      });
-    });
+    var allUpsFull = getLS(KU);
+    var doneSetFull = new Set(allUpsFull.map(function(x) { return x.no; }));
 
     var tblProg1 = [[
       { text: 'No',      options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9 } },
       { text: 'Program', options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9 } },
       { text: 'Kategori',options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9 } },
       { text: 'Status',  options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9, align: 'center' } },
-      { text: 'Tanggal', options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9 } }
+      { text: 'Tgl Upload Terakhir', options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9 } }
     ]];
 
     function getKatForNo(no) {
@@ -2599,15 +1776,17 @@ function exportPPT() {
       return found;
     }
 
-    function getProgRecord(no) {
-      var arr = getLS(KP);
-      return arr.find(function(x) { return x.no === no; }) || null;
+    function getLastUploadForProg(no) {
+      var recs = allUpsFull.filter(function(x) { return x.no === no; });
+      if (!recs.length) return null;
+      recs.sort(function(a, b) { return new Date(b.at || 0) - new Date(a.at || 0); });
+      return recs[0];
     }
 
     for (var n = 1; n <= 15; n++) {
       var isDone2 = doneSetFull.has(n);
-      var rec2    = getProgRecord(n);
-      var tglStr2 = rec2 && rec2.fields && rec2.fields.tgl ? fmtDateOnly(rec2.fields.tgl) : '-';
+      var rec2    = getLastUploadForProg(n);
+      var tglStr2 = rec2 && rec2.tglUpload ? fmtDateOnly(rec2.tglUpload) : '-';
       var rowFill3 = isDone2 ? 'dcfce7' : 'fff7ed';
 
       tblProg1.push([
@@ -2639,13 +1818,13 @@ function exportPPT() {
       { text: 'Program', options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9 } },
       { text: 'Kategori',options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9 } },
       { text: 'Status',  options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9, align: 'center' } },
-      { text: 'Tanggal', options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9 } }
+      { text: 'Tgl Upload Terakhir', options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9 } }
     ]];
 
     for (var n2 = 16; n2 <= 30; n2++) {
       var isDone3 = doneSetFull.has(n2);
-      var rec3    = getProgRecord(n2);
-      var tglStr3 = rec3 && rec3.fields && rec3.fields.tgl ? fmtDateOnly(rec3.fields.tgl) : '-';
+      var rec3    = getLastUploadForProg(n2);
+      var tglStr3 = rec3 && rec3.tglUpload ? fmtDateOnly(rec3.tglUpload) : '-';
       var rowFill4 = isDone3 ? 'dcfce7' : 'fff7ed';
 
       tblProg2.push([
@@ -2664,57 +1843,54 @@ function exportPPT() {
       autoPage: false
     });
 
-    // ---- SLIDE 7: Riwayat Inspeksi ----
-    var s7 = pptx.addSlide();
-    addBg(s7, C_LIGHT);
-    s7.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: '100%', h: 0.8, fill: { color: C_DARK } });
-    s7.addText('🔍 RIWAYAT INSPEKSI — ' + bulanStr.toUpperCase(), {
-      x: 0.3, y: 0.1, w: 11, h: 0.6, fontSize: 16, bold: true, color: C_WHITE
+    // ---- SLIDE 7+: LAMPIRAN FOTO DOKUMENTASI IMPLEMENTASI PROGRAM ----
+    // Menampilkan semua jenis foto (gambar) yang sudah diupload melalui menu Upload Dokumen.
+    var allUpsForPhoto = (getLS(KU) || []).filter(function(x) {
+      return x.file && x.file.type && x.file.type.indexOf('image/') === 0 && x.file.data;
     });
 
-    var inspArr = getLS(KI).slice(0, 20);
-    if (inspArr.length) {
-      var tblInsp = [[
-        { text: 'Tanggal',  options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9 } },
-        { text: 'Jenis',    options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9 } },
-        { text: 'Inspektor',options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9 } },
-        { text: 'Lokasi',   options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9 } },
-        { text: 'Unit',     options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9 } },
-        { text: '✓ OK',     options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9, align: 'center' } },
-        { text: '✗ NOK',    options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9, align: 'center' } }
-      ]];
+    if (allUpsForPhoto.length) {
+      var perSlide = 4; // 2x2 grid foto per slide
+      var totalPhotoSlides = Math.ceil(allUpsForPhoto.length / perSlide);
+      for (var ps = 0; ps < totalPhotoSlides; ps++) {
+        var sAtt = pptx.addSlide();
+        addBg(sAtt, C_LIGHT);
+        sAtt.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: '100%', h: 0.7, fill: { color: C_DARK } });
+        sAtt.addText('📸 LAMPIRAN DOKUMENTASI IMPLEMENTASI PROGRAM (' + (ps + 1) + '/' + totalPhotoSlides + ')', {
+          x: 0.3, y: 0.1, w: 11, h: 0.5, fontSize: 14, bold: true, color: C_WHITE
+        });
 
-      inspArr.forEach(function(x, i3) {
-        var cl3  = x.checklist || [];
-        var ok3  = cl3.filter(function(c) { return c && (c.kondisi === 'OK' || c.kondisi === 'LENGKAP'); }).length;
-        var nok3 = cl3.filter(function(c) { return c && (c.kondisi === 'NOT OK' || c.kondisi === 'TIDAK LENGKAP' || c.kondisi === 'RUSAK'); }).length;
-        var rowF = i3 % 2 === 0 ? C_WHITE : 'f9fafb';
-
-        tblInsp.push([
-          { text: fmtDateOnly(x.tgl || x.at), options: { fontSize: 8, fill: rowF } },
-          { text: x.jenis || '-',  options: { fontSize: 8, fill: rowF, bold: true } },
-          { text: x.nama  || '-',  options: { fontSize: 8, fill: rowF } },
-          { text: x.lokasi|| '-',  options: { fontSize: 8, fill: rowF } },
-          { text: x.unit  || '-',  options: { fontSize: 8, fill: rowF } },
-          { text: String(ok3),  options: { align: 'center', fontSize: 9, fill: rowF, color: '15803d', bold: true } },
-          { text: String(nok3), options: { align: 'center', fontSize: 9, fill: rowF, color: 'b91c1c', bold: true } }
-        ]);
-      });
-
-      s7.addTable(tblInsp, {
-        x: 0.3, y: 0.9, w: 11.4,
-        colW: [1.5, 2.0, 1.8, 1.8, 1.2, 0.8, 0.8],
-        border: { type: 'solid', color: 'd1d5db', pt: 0.5 },
-        autoPage: false
-      });
+        var chunk = allUpsForPhoto.slice(ps * perSlide, ps * perSlide + perSlide);
+        var positions = [
+          { x: 0.4,  y: 0.95 }, { x: 6.15, y: 0.95 },
+          { x: 0.4,  y: 3.55 }, { x: 6.15, y: 3.55 }
+        ];
+        chunk.forEach(function(item, idx) {
+          var pos = positions[idx];
+          try {
+            sAtt.addImage({ data: item.file.data, x: pos.x, y: pos.y, w: 5.4, h: 2.35, sizing: { type: 'contain', w: 5.4, h: 2.35 } });
+          } catch(e) { console.warn('addImage lampiran gagal:', e); }
+          var caption = 'P' + item.no + ' — ' + (item.title || '') +
+                        ' (' + fmtDateOnly(item.tglUpload) + ')';
+          sAtt.addText(caption, {
+            x: pos.x, y: pos.y + 2.38, w: 5.4, h: 0.3,
+            fontSize: 8, color: C_GRAY, align: 'center'
+          });
+        });
+      }
     } else {
-      s7.addText('Belum ada data inspeksi untuk periode ini.', {
-        x: 0.3, y: 2.5, w: 11, h: 0.5,
-        fontSize: 13, color: C_GRAY, italic: true, align: 'center'
+      var sAttEmpty = pptx.addSlide();
+      addBg(sAttEmpty, C_LIGHT);
+      sAttEmpty.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: '100%', h: 0.7, fill: { color: C_DARK } });
+      sAttEmpty.addText('📸 LAMPIRAN DOKUMENTASI IMPLEMENTASI PROGRAM', {
+        x: 0.3, y: 0.1, w: 11, h: 0.5, fontSize: 14, bold: true, color: C_WHITE
+      });
+      sAttEmpty.addText('Belum ada foto (dokumen bertipe gambar) yang diupload.', {
+        x: 0.3, y: 2.5, w: 11, h: 0.5, fontSize: 13, color: C_GRAY, italic: true, align: 'center'
       });
     }
 
-    // ---- SLIDE 8: Penutup ----
+    // ---- SLIDE Penutup ----
     var s8 = pptx.addSlide();
     addBg(s8, '14532d');
     s8.addShape(pptx.ShapeType.rect, { x: 0, y: 2.5, w: '100%', h: 0.06, fill: { color: C_GREEN } });
@@ -2727,7 +1903,7 @@ function exportPPT() {
       fontSize: 14, color: '86efac', align: 'center', italic: true
     });
     s8.addText('📊 Total Program: ' + data.progDone + '/' + (setting.totalProg||30) +
-               '   |   🔍 Inspeksi: ' + data.inspDone +
+               '   |   📁 Upload: ' + (getLS(KU)||[]).length +
                '   |   📈 Pencapaian: ' + data.pct + '%', {
       x: 0.5, y: 2.8, w: 11, h: 0.5,
       fontSize: 13, color: C_GREEN, align: 'center', bold: true
@@ -2772,11 +1948,9 @@ if ('serviceWorker' in navigator) {
 // STORAGE EVENT (sync antar tab/perangkat)
 // ============================================================
 window.addEventListener('storage', function(e) {
-  if (e.key === KI || e.key === KP || e.key === KU || e.key === KT) {
+  if (e.key === KU || e.key === KT) {
     refreshAll();
     if (currentView === 'history')    renderHistory();
-    if (currentView === 'aspek')      renderAspek();
-    if (currentView === 'rinspeksi')  renderRiwayatInspeksi();
     if (currentView === 'setting')    renderSettingTable();
   }
 });
@@ -2793,9 +1967,7 @@ function init() {
   var badge = document.getElementById('filterBadge');
   if (badge) badge.textContent = 'Tahun ' + filterTahun;
 
-  try { fillJamSelect(); } catch(e) {}
   try { fillDateSelects('upTgl','upBln','upThn'); } catch(e) {}
-  try { fillDateSelects('inspTgl','inspBln','inspThn'); } catch(e) {}
   try { initDD(); } catch(e) {}
   try { refreshAll(); } catch(e) {}
   try { loadFromSupabase(); } catch(e) { console.error('init loadFromSupabase:', e); }
