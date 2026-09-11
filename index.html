@@ -66,6 +66,23 @@ body{background:#f0fdf4;color:#000;display:flex;min-height:100vh;}
 .kpi.purple .lbl{color:#7c3aed;}.kpi.purple .val{color:#6d28d9;}
 .kpi.orange{background:linear-gradient(135deg,rgba(249,115,22,.08),rgba(249,115,22,.04));border-color:rgba(249,115,22,.2);}
 .kpi.orange .lbl{color:#c2410c;}.kpi.orange .val{color:#9a3412;}
+.kpi.red{background:linear-gradient(135deg,rgba(239,68,68,.08),rgba(239,68,68,.04));border-color:rgba(239,68,68,.2);}
+.kpi.red .lbl{color:#b91c1c;}.kpi.red .val{color:#991b1b;}
+.kpi.yellow{background:linear-gradient(135deg,rgba(234,179,8,.10),rgba(234,179,8,.04));border-color:rgba(234,179,8,.25);}
+.kpi.yellow .lbl{color:#92400e;}.kpi.yellow .val{color:#854d0e;}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:2000;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:#fff;border-radius:16px;max-width:640px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,.25);}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(34,197,94,.15);position:sticky;top:0;background:#fff;z-index:1;border-radius:16px 16px 0 0;}
+.modal-head b{font-size:15px;}
+.modal-close{background:none;border:none;font-size:18px;cursor:pointer;color:#6b7280;padding:4px 8px;}
+.modal-body{padding:18px 20px;}
+.modal-foot{display:flex;gap:8px;padding:14px 20px;border-top:1px solid rgba(34,197,94,.12);flex-wrap:wrap;}
+.kv-row{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed rgba(0,0,0,.08);font-size:13px;}
+.kv-row .k{color:#6b7280;font-weight:600;}
+.kv-row .v{font-weight:700;text-align:right;}
 
 /* Progress */
 .prog-wrap{margin-bottom:18px;}
@@ -229,18 +246,14 @@ tbody tr:hover{background:rgba(34,197,94,.04);}
   </div>
   <div class="menu-title">Main Menu</div>
   <ul class="menu">
-    <li><a class="active" data-view="dashboard"><span class="ic">📊</span>Dashboard</a></li>
-    <li><a data-view="upload"><span class="ic">📁</span>Upload Dokumen</a></li>
-    <li><a data-view="history"><span class="ic">🕘</span>Riwayat Upload</a></li>
-    <div class="menu-sep"></div>
-    <li><a data-view="setting"><span class="ic">⚙️</span>Setting Target</a></li>
+    <li><a class="active" data-view="komisioning"><span class="ic">🛠️</span>Komisioning Unit</a></li>
   </ul>
 </aside>
 
 <main class="content">
   <div class="topbar">
     <button class="hamburger" onclick="toggleSidebar()">☰</button>
-    <span class="topbar-title" id="topbarTitle">Dashboard</span>
+    <span class="topbar-title" id="topbarTitle">Komisioning Unit</span>
     <div class="conn-status online" id="connStatus">
       <div class="conn-dot"></div><span id="connText">Online</span>
     </div>
@@ -254,170 +267,115 @@ tbody tr:hover{background:rgba(34,197,94,.04);}
     <button class="btn sm" onclick="hidePWA()">✕</button>
   </div>
 
-  <!-- ===== DASHBOARD ===== -->
-  <div id="view-dashboard" class="view active">
+  <!-- ===== KOMISIONING UNIT ===== -->
+  <div id="view-komisioning" class="view active">
     <div class="panel">
       <div class="section-header">
-        <div class="section-title"><div class="dot"></div>Program Kerja Plant Safety</div>
-        <button class="btn sm primary" onclick="safeLoadFromSupabase();safeRefresh();">↻ Sync</button>
+        <div class="section-title"><div class="dot"></div>Monitoring Komisioning Unit</div>
+        <button class="btn sm primary" onclick="openKomForm()">➕ Tambah Unit</button>
+      </div>
+      <div class="hint" style="margin-bottom:14px;">Masa aktif komisioning berlaku 6 bulan sejak tanggal komisioning. Status dihitung otomatis (H-30 = Mendekati Kadaluarsa).</div>
+
+      <div class="kpi-grid">
+        <div class="kpi blue"><div class="lbl">Total Unit</div><div class="val" id="komKpiTotal">0</div><div class="sub">unit terkomisioning</div></div>
+        <div class="kpi"><div class="lbl">Aktif</div><div class="val" id="komKpiAktif">0</div><div class="sub">masih berlaku</div></div>
+        <div class="kpi yellow"><div class="lbl">Mendekati Kadaluarsa</div><div class="val" id="komKpiWarn">0</div><div class="sub">H-30 sebelum berakhir</div></div>
+        <div class="kpi red"><div class="lbl">Kadaluarsa</div><div class="val" id="komKpiExpired">0</div><div class="sub">perlu komisioning ulang</div></div>
       </div>
 
       <div class="filter-bar">
-        <label>🗓️ Periode:</label>
-        <select class="filter-select" id="fBulan" onchange="applyFilter()">
-          <option value="0">Semua Bulan</option>
-          <option value="1">Januari</option><option value="2">Februari</option>
-          <option value="3">Maret</option><option value="4">April</option>
-          <option value="5">Mei</option><option value="6">Juni</option>
-          <option value="7">Juli</option><option value="8">Agustus</option>
-          <option value="9">September</option><option value="10">Oktober</option>
-          <option value="11">November</option><option value="12">Desember</option>
+        <label>🔎 Cari:</label>
+        <input type="text" id="komSearch" placeholder="Nama / nomor unit..." style="flex:1;min-width:160px;padding:7px 10px;border-radius:8px;border:1px solid rgba(34,197,94,.25);font-size:12px;" oninput="renderKomisioning()"/>
+        <select class="filter-select" id="komFStatus" onchange="renderKomisioning()">
+          <option value="">Semua Status</option>
+          <option value="Aktif">Aktif</option>
+          <option value="Mendekati Kadaluarsa">Mendekati Kadaluarsa</option>
+          <option value="Kadaluarsa">Kadaluarsa</option>
         </select>
-        <select class="filter-select" id="fTahun" onchange="applyFilter()"></select>
-        <button class="btn sm" onclick="resetFilter()">Reset</button>
-        <span class="filter-badge" id="filterBadge">Semua Data</span>
-        <button class="btn sm info" onclick="exportPPT()" style="margin-left:auto;">📊 Export PPT</button>
+        <select class="filter-select" id="komFKategori" onchange="renderKomisioning()"><option value="">Semua Kategori</option></select>
+        <select class="filter-select" id="komFLokasi" onchange="renderKomisioning()"><option value="">Semua Lokasi</option></select>
+        <button class="btn sm" onclick="resetKomFilter()">Reset</button>
       </div>
 
-      <div class="kpi-grid">
-        <div class="kpi"><div class="lbl">Program Selesai</div><div class="val" id="kpi1">0</div><div class="sub" id="kpi1sub">dari 30 program</div></div>
-        <div class="kpi blue"><div class="lbl">Pencapaian</div><div class="val" id="kpi2">0%</div><div class="sub">upload vs target program</div></div>
-        <div class="kpi orange"><div class="lbl">Upload Dok</div><div class="val" id="kpi3">0</div><div class="sub">file tersimpan</div></div>
+      <div class="chart-grid" style="grid-template-columns:1fr;max-width:320px;">
+        <div class="chart-box"><div class="chart-box-title">🍩 Komposisi Status</div><canvas id="komChart"></canvas></div>
       </div>
 
-      <div class="prog-wrap">
-        <div class="prog-label"><span>📈 Pencapaian Total</span><span id="progPct">0%</span></div>
-        <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
-        <div class="hint" id="progDetail" style="margin-top:6px;"></div>
-      </div>
-
-      <div class="chart-grid">
-        <div class="chart-box"><div class="chart-box-title">📊 Program vs Target</div><canvas id="c1"></canvas></div>
-        <div class="chart-box"><div class="chart-box-title">🍩 Status Program</div><canvas id="c2"></canvas></div>
-        <div class="chart-box"><div class="chart-box-title">📋 Per Kategori</div><canvas id="c3"></canvas></div>
-        <div class="chart-box"><div class="chart-box-title">📈 Tren Aktivitas</div><canvas id="c4"></canvas></div>
-      </div>
-
-      <div class="summary-title">📋 Ringkasan Pencapaian per Kategori</div>
+      <div class="summary-title" style="margin-top:16px;">📋 Daftar Unit Terkomisioning</div>
       <div class="tbl-wrap">
         <table>
           <thead><tr>
-            <th>Kategori</th><th>Target</th><th>Selesai</th>
-            <th>% Pencapaian</th><th>Status</th>
+            <th>Nama Unit</th><th>Nomor Unit</th><th>Kategori</th><th>Lokasi</th>
+            <th>Tgl Komisioning</th><th>Tgl Berakhir</th><th>Status</th><th>Aksi</th>
           </tr></thead>
-          <tbody id="summaryBody"></tbody>
-          <tfoot id="summaryFoot"></tfoot>
-        </table>
-      </div>
-
-      <div class="summary-title" style="margin-top:18px;">📅 Pencapaian per Bulan — Tahun <span id="tahunLabel">-</span></div>
-      <div class="tbl-wrap">
-        <table>
-          <thead><tr>
-            <th>Bulan</th><th>Target Prog</th>
-            <th>Program Tercapai</th>
-            <th>Upload Dok</th><th>Total Aktivitas</th><th>Status</th>
-          </tr></thead>
-          <tbody id="bulananBody"></tbody>
+          <tbody id="komBody"></tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <!-- ===== UPLOAD ===== -->
-  <div id="view-upload" class="view">
-    <div class="panel">
-      <div class="panel-title"><div class="dot"></div>Upload Dokumen Program</div>
-      <div class="grid2">
-        <div class="form-group">
-          <label class="form-label">Pilih Program (1-30)</label>
-          <div class="dd-wrap">
-            <div class="dd-btn" id="ddBtn"><span id="ddText">Pilih program...</span><span>▾</span></div>
-            <div class="dd-list" id="ddList"></div>
+  <!-- Modal Form / Pratinjau Komisioning -->
+  <div class="modal-overlay" id="komFormModal">
+    <div class="modal-box">
+      <div class="modal-head"><b id="komFormTitle">Tambah Unit Komisioning</b><button class="modal-close" onclick="closeKomForm()">✕</button></div>
+      <div class="modal-body">
+        <div id="komFormStep">
+          <input type="hidden" id="kom_id" value=""/>
+          <input type="hidden" id="kom_riwayatOf" value=""/>
+          <div class="grid2">
+            <div class="form-group"><label class="form-label">Nama Unit *</label><input type="text" id="kom_namaUnit" placeholder="Contoh: Excavator"/></div>
+            <div class="form-group"><label class="form-label">Nomor Unit / Lambung *</label><input type="text" id="kom_nomorUnit" placeholder="Contoh: EXC-07"/></div>
+            <div class="form-group"><label class="form-label">Kategori</label><input type="text" id="kom_kategori" placeholder="Contoh: Alat Berat"/></div>
+            <div class="form-group"><label class="form-label">Lokasi / Area</label><input type="text" id="kom_lokasiArea" placeholder="Contoh: Pit A"/></div>
+            <div class="form-group"><label class="form-label">Petugas Komisioning *</label><input type="text" id="kom_petugas" placeholder="Nama petugas/inspektor"/></div>
+            <div class="form-group"><label class="form-label">No. Sertifikat *</label><input type="text" id="kom_noSertifikat" placeholder="Nomor sertifikat/berita acara"/></div>
+            <div class="form-group"><label class="form-label">Tanggal Komisioning *</label>
+              <div class="date-selects">
+                <select id="kom_tgl_d" class="form-select"></select>
+                <select id="kom_tgl_m" class="form-select"></select>
+                <select id="kom_tgl_y" class="form-select"></select>
+              </div>
+            </div>
+            <div class="form-group"><label class="form-label">Tanggal Berakhir (otomatis, +6 bulan)</label>
+              <input type="text" id="kom_tglBerakhir" placeholder="-" disabled style="background:#f3f4f6;font-weight:700;color:#15803d;"/>
+            </div>
           </div>
-          <input type="hidden" id="ddVal" value="0"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Tanggal Upload Dokumen</label>
-          <div class="date-selects">
-            <select id="upTgl" class="form-select"></select>
-            <select id="upBln" class="form-select"></select>
-            <select id="upThn" class="form-select"></select>
+          <div class="form-group"><label class="form-label">Dokumen Pendukung (PDF/Image, opsional)</label>
+            <input type="file" id="kom_file" accept="image/*,application/pdf"/>
+            <div class="hint" id="kom_fileInfo">Belum ada file dipilih.</div>
           </div>
+          <div class="form-group"><label class="form-label">Catatan</label><textarea id="kom_catatan" rows="2" placeholder="Catatan tambahan (opsional)"></textarea></div>
+          <div class="hint" id="komFormHint"></div>
+        </div>
+
+        <div id="komPreviewStep" style="display:none;">
+          <div class="hint" style="margin-bottom:8px;">Periksa kembali data sebelum disimpan.</div>
+          <div id="komPreviewBody"></div>
         </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Upload File (image / PDF, maks 5MB)</label>
-        <input type="file" id="upFile" accept="image/*,application/pdf"/>
-        <div class="hint" id="upFileInfo">Belum ada file dipilih.</div>
+      <div class="modal-foot" id="komFormFootStep1">
+        <button class="btn primary" style="flex:1;" onclick="showKomPreview()">👁️ Pratinjau</button>
+        <button class="btn danger" onclick="closeKomForm()">Batal</button>
       </div>
-      <div class="btnrow">
-        <button class="btn primary" onclick="doUpload()">💾 Simpan</button>
-        <button class="btn danger" onclick="resetUpload()">Reset</button>
-      </div>
-      <div class="hint" id="upHint" style="margin-top:10px;">Belum ada aksi.</div>
-    </div>
-  </div>
-
-  <!-- ===== RIWAYAT UPLOAD ===== -->
-  <div id="view-history" class="view">
-    <div class="panel">
-      <div class="section-header">
-        <div class="section-title"><div class="dot"></div>Riwayat Upload</div>
-        <button class="btn danger sm" onclick="clearUploads()">Hapus Semua</button>
-      </div>
-      <div class="tbl-wrap">
-        <table>
-          <thead><tr><th>Tgl Upload</th><th>Program</th><th>Nama Program</th><th>File</th><th>Tipe</th></tr></thead>
-          <tbody id="histBody"></tbody>
-        </table>
+      <div class="modal-foot" id="komFormFootStep2" style="display:none;">
+        <button class="btn primary" style="flex:1;" onclick="submitKomisioning()">💾 Simpan</button>
+        <button class="btn info" onclick="backToKomForm()">✏️ Edit</button>
       </div>
     </div>
   </div>
 
-  <!-- ===== SETTING TARGET ===== -->
-  <div id="view-setting" class="view">
-    <div class="panel">
-      <div class="panel-title"><div class="dot"></div>⚙️ Setting Target Bulanan</div>
-      <div class="hint" style="margin-bottom:16px;">Atur target program per bulan untuk tracking pencapaian.</div>
-
-      <div class="form-group">
-        <label class="form-label">Tahun</label>
-        <select id="settingTahun" class="form-select" style="max-width:160px;" onchange="renderSettingTable()"></select>
-      </div>
-
-      <div class="summary-title">🎯 Target Program per Bulan</div>
-      <div class="target-grid" id="targetProgGrid"></div>
-
-      <div class="summary-title" style="margin-top:16px;">📊 Target Keseluruhan</div>
-      <div class="grid2">
-        <div class="form-group">
-          <label class="form-label">Total Target Program (default: 30)</label>
-          <input type="number" id="settingTotalProg" value="30" min="1" max="100"/>
-        </div>
-      </div>
-
-      <div class="btnrow">
-        <button class="btn primary" onclick="saveSetting()">💾 Simpan Setting</button>
-        <button class="btn danger" onclick="resetSetting()">Reset Default</button>
-      </div>
-      <div class="hint" id="settingHint" style="margin-top:10px;"></div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-title"><div class="dot"></div>📋 Preview Target vs Actual</div>
-      <div class="tbl-wrap">
-        <table>
-          <thead><tr>
-            <th>Bulan</th>
-            <th>Target Prog</th><th>Actual Prog</th><th>% Prog</th>
-            <th>Status</th>
-          </tr></thead>
-          <tbody id="settingPreviewBody"></tbody>
-        </table>
+  <!-- Modal Detail & Riwayat -->
+  <div class="modal-overlay" id="komDetailModal">
+    <div class="modal-box">
+      <div class="modal-head"><b>Detail Unit</b><button class="modal-close" onclick="closeKomDetail()">✕</button></div>
+      <div class="modal-body" id="komDetailBody"></div>
+      <div class="modal-foot">
+        <button class="btn info" id="komDetailEditBtn" style="flex:1;">✏️ Edit</button>
+        <button class="btn danger" id="komDetailDeleteBtn">🗑️ Hapus</button>
       </div>
     </div>
   </div>
+
 
 </main>
 
@@ -430,42 +388,48 @@ tbody tr:hover{background:rgba(34,197,94,.04);}
 
 // ============================================================
 // NEON (VIA VERCEL SERVERLESS API) CONFIG
-// Menggantikan Supabase — endpoint /api/<table> di-handle oleh
-// api/[table].js yang connect ke Neon Postgres pakai DATABASE_URL.
+// Endpoint /api/komisioning di-handle oleh api/komisioning.js yang
+// connect ke Neon Postgres memakai DATABASE_URL. Mendukung:
+//   GET    /api/komisioning         -> daftar semua unit
+//   POST   /api/komisioning         -> tambah unit baru
+//   PUT    /api/komisioning?id=ID   -> update unit
+//   DELETE /api/komisioning?id=ID   -> hapus unit
 // ============================================================
-var API_BASE = ''; // kosong = relative ke domain sendiri, cth: /api/upload
+var API_BASE = ''; // kosong = relative ke domain sendiri
 
-function pgFrom(table) {
-  return {
-    select: function() {
-      return {
-        order: function() {
-          return fetch(API_BASE + '/api/' + table)
-            .then(function(r) { return r.json(); })
-            .then(function(json) { return { data: json.data || [], error: json.error || null }; })
-            .catch(function(e) { return { data: [], error: e }; });
-        }
-      };
-    },
-    insert: function(obj) {
-      return fetch(API_BASE + '/api/' + table, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(obj)
-      })
-        .then(function(r) { return r.json(); })
-        .then(function(json) { return { data: json.data || null, error: json.error || null }; })
-        .catch(function(e) { return { error: e }; });
-    }
-  };
-}
-var db = { from: pgFrom };
+var komApi = {
+  list: function() {
+    return fetch(API_BASE + '/api/komisioning')
+      .then(function(r) { return r.json(); })
+      .then(function(json) { return { data: json.data || [], error: json.error || null }; })
+      .catch(function(e) { return { data: [], error: e }; });
+  },
+  create: function(obj) {
+    return fetch(API_BASE + '/api/komisioning', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(obj)
+    }).then(function(r) { return r.json(); })
+      .then(function(json) { return { data: json.data || null, error: json.error || null }; })
+      .catch(function(e) { return { error: e }; });
+  },
+  update: function(id, obj) {
+    return fetch(API_BASE + '/api/komisioning?id=' + encodeURIComponent(id), {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(obj)
+    }).then(function(r) { return r.json(); })
+      .then(function(json) { return { data: json.data || null, error: json.error || null }; })
+      .catch(function(e) { return { error: e }; });
+  },
+  remove: function(id) {
+    return fetch(API_BASE + '/api/komisioning?id=' + encodeURIComponent(id), { method: 'DELETE' })
+      .then(function(r) { return r.json(); })
+      .then(function(json) { return { data: json.data || null, error: json.error || null }; })
+      .catch(function(e) { return { error: e }; });
+  }
+};
 
 // ============================================================
 // STORAGE KEYS
 // ============================================================
-var KU = 'kpp_uploads_v3';
-var KT = 'kpp_targets_v1';
+var KKOM = 'kpp_komisioning_v1';
 
 // ============================================================
 // STORAGE HELPERS
@@ -478,12 +442,6 @@ function setLS(k, v) {
     console.warn('localStorage full, trimming...');
     try { localStorage.setItem(k, JSON.stringify((v||[]).slice(0,50))); } catch(e2) {}
   }
-}
-function getObjLS(k, def) {
-  try { return JSON.parse(localStorage.getItem(k) || JSON.stringify(def)); } catch(e) { return def; }
-}
-function setObjLS(k, v) {
-  try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {}
 }
 
 function esc(s) {
@@ -520,37 +478,8 @@ function fmtDate(x) {
 var BULAN_NAMA = ['','Januari','Februari','Maret','April','Mei','Juni',
                   'Juli','Agustus','September','Oktober','November','Desember'];
 
-var TITLES = {
-  1:"Pelatihan Hand & Finger Safety",2:"Pelatihan Power Tools",
-  3:"Campaign Pencegahan H & F Injury",4:"Permit Power Tools",
-  5:"Inspeksi Tools Box",6:"Kalibrasi torque wrench dan power torque",
-  7:"Training & refresh Lifting & Rigging",8:"Sertifikasi Operator Alat Angkat",
-  9:"Sertifikasi Rigger (Juru Ikat)",10:"Campaign Alat Angkat",
-  11:"Inspeksi Alat Angkat & Perlengkapannya",12:"Pelatihan Near Water",
-  13:"Campaign Pencegahan Burning & Sunk",14:"Pencucian Unit",
-  15:"Refresh & Pelatihan HRA Bekerja dengan Listrik",
-  16:"Refresh & Pelatihan HRA Bekerja Dengan Panas",
-  17:"Sertifikasi Ahli K3 Listrik",18:"Sertifikasi Teknisi K3 Listrik",
-  19:"Sertifikasi Juru Las",20:"Inspeksi Panel Listrik",
-  21:"Campaign kondisi Panel Listrik",22:"Pemasangan ELCB di Semua Panel Listrik",
-  23:"Refresh Tyre Knowledge Utilization",24:"Sertifikasi Operator Tyre Handler",
-  25:"Inspeksi Tools tyre",26:"Kalibrasi Tools Tyre",27:"Campaign Tyre Management",
-  28:"Pemantauan dan Tindak Lanjut MCU",29:"Pelaksanaan SAP GL Up",30:"Sertifikasi POP & POM"
-};
-
-var KATEGORI = {
-  "Hand & Finger":[1,2,3,4],
-  "Tools & Equipment":[5,6,25,26],
-  "Lifting & Rigging":[7,8,9,10,11],
-  "Near Water":[12,13,14],
-  "Listrik & Las":[15,16,17,18,19,20,21,22],
-  "Tyre Management":[23,24,27],
-  "Sertifikasi & Admin":[28,29,30]
-};
-
 var PAGE_TITLES = {
-  dashboard:'Dashboard',upload:'Upload Dokumen',history:'Riwayat Upload',
-  setting:'Setting Target'
+  komisioning:'Komisioning Unit'
 };
 
 // ============================================================
@@ -596,7 +525,7 @@ function closeSidebar() {
   document.getElementById('overlay').classList.remove('show');
 }
 
-var currentView = 'dashboard';
+var currentView = 'komisioning';
 function navigate(viewName) {
   document.querySelectorAll('.view').forEach(function(el) { el.classList.remove('active'); });
   document.querySelectorAll('.menu li a').forEach(function(a) { a.classList.remove('active'); });
@@ -609,10 +538,7 @@ function navigate(viewName) {
   var tb = document.getElementById('topbarTitle');
   if (tb) tb.textContent = PAGE_TITLES[viewName] || viewName;
   closeSidebar();
-  if (viewName === 'dashboard') { refreshAll(); }
-  if (viewName === 'history') { renderHistory(); }
-  if (viewName === 'upload') { initDD(); fillDateSelects('upTgl','upBln','upThn'); }
-  if (viewName === 'setting') { initSetting(); }
+  if (viewName === 'komisioning') { renderKomisioning(); }
 }
 
 document.querySelectorAll('.menu li a').forEach(function(a) {
@@ -684,70 +610,6 @@ function getDateFromSelects(tglId, blnId, thnId) {
   return y + '-' + mm + '-' + dd;
 }
 
-function fillFilterTahun() {
-  var el = document.getElementById('fTahun');
-  if (!el) return;
-  var now = new Date().getFullYear();
-  el.innerHTML = '<option value="0">Semua Tahun</option>';
-  for (var y = now - 3; y <= now + 2; y++) {
-    var o = document.createElement('option');
-    o.value = y; o.textContent = String(y);
-    if (y === now) o.selected = true;
-    el.appendChild(o);
-  }
-}
-
-// ============================================================
-// FILTER STATE
-// ============================================================
-var filterBulan = 0, filterTahun = 0;
-
-function applyFilter() {
-  filterBulan = Number(document.getElementById('fBulan').value);
-  filterTahun = Number(document.getElementById('fTahun').value);
-  var badge = document.getElementById('filterBadge');
-  if (filterBulan === 0 && filterTahun === 0) {
-    badge.textContent = 'Semua Data';
-  } else {
-    var txt = '';
-    if (filterBulan > 0) txt += BULAN_NAMA[filterBulan] + ' ';
-    if (filterTahun > 0) txt += filterTahun;
-    badge.textContent = txt.trim();
-  }
-  refreshAll();
-}
-
-function resetFilter() {
-  document.getElementById('fBulan').value = '0';
-  var fThn = document.getElementById('fTahun');
-  if (fThn) fThn.value = new Date().getFullYear();
-  filterBulan = 0;
-  filterTahun = new Date().getFullYear();
-  var badge = document.getElementById('filterBadge');
-  if (badge) badge.textContent = 'Tahun ' + filterTahun;
-  refreshAll();
-}
-
-function matchFilter(isoDate) {
-  if (!isoDate) return (filterBulan === 0 && filterTahun === 0);
-  var d;
-  if (typeof isoDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(isoDate)) {
-    var parts = isoDate.split('-');
-    d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-  } else {
-    d = new Date(isoDate);
-  }
-  if (isNaN(d.getTime())) return false;
-  var m = d.getMonth() + 1;
-  var y = d.getFullYear();
-  return (filterBulan === 0 || m === filterBulan) && (filterTahun === 0 || y === filterTahun);
-}
-
-// ============================================================
-// HITUNG PENCAPAIAN
-// ============================================================
-function getUpDate(x)   { return (x && x.tglUpload) ? x.tglUpload : (x && x.at ? x.at : null); }
-
 function toDateObj(iso) {
   if (!iso) return null;
   if (typeof iso === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(iso)) {
@@ -756,41 +618,6 @@ function toDateObj(iso) {
   }
   var d = new Date(iso);
   return isNaN(d.getTime()) ? null : d;
-}
-
-function getSetting() {
-  return getObjLS(KT, {
-    totalProg: 30,
-    progBulan: {}
-  });
-}
-
-// Pencapaian dihitung dari jumlah Upload Dokumen dibanding Target Program.
-// "Program Selesai" kini ditentukan dari Upload Dokumen: sebuah program (1-30)
-// dianggap selesai jika sudah ada minimal satu dokumen yang diupload untuknya
-// (menu Program dihapus, jadi tidak ada lagi form submit terpisah).
-function hitungPencapaian() {
-  var allUps   = getLS(KU);
-  var setting  = getSetting();
-
-  var ups = allUps.filter(function(x) { return matchFilter(getUpDate(x)); });
-
-  // Program selesai: unik per nomor program yang punya upload
-  var doneSet = new Set(ups.map(function(x) { return x.no; }));
-
-  var progDone    = doneSet.size;
-  var totalTarget = setting.totalProg || 30;
-  var uploadCount = ups.length;
-  var totalActual = uploadCount;
-  var pct = totalTarget > 0 ? Math.min(100, Math.round(uploadCount / totalTarget * 100)) : 0;
-
-  return {
-    progDone: progDone,
-    totalTarget: totalTarget, totalActual: totalActual, uploadCount: uploadCount,
-    pct: pct, doneSet: doneSet,
-    ups: ups, allUps: allUps,
-    setting: setting
-  };
 }
 
 // ============================================================
@@ -807,28 +634,6 @@ var COLORS = {
   red:    { bg: 'rgba(239,68,68,.75)',   border: '#ef4444' },
   cyan:   { bg: 'rgba(6,182,212,.75)',   border: '#06b6d4' },
   lime:   { bg: 'rgba(132,204,22,.75)',  border: '#84cc16' }
-};
-
-var CHART_PALETTE = [
-  COLORS.green, COLORS.blue, COLORS.purple, COLORS.orange,
-  COLORS.teal, COLORS.pink, COLORS.yellow, COLORS.cyan, COLORS.lime, COLORS.red
-];
-
-function paletteArr(n, key) {
-  return Array.from({length: n}, function(_, i) { return CHART_PALETTE[i % CHART_PALETTE.length][key]; });
-}
-
-var CHART_OPTS_BASE = {
-  responsive: true,
-  maintainAspectRatio: true,
-  plugins: {
-    legend: { labels: { color: '#374151', font: { size: 10 }, padding: 8 } },
-    tooltip: { callbacks: {} }
-  },
-  scales: {
-    x: { grid: { color: 'rgba(0,0,0,.05)' }, ticks: { color: '#6b7280', font: { size: 9 } } },
-    y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,.06)' }, ticks: { color: '#6b7280', font: { size: 9 } } }
-  }
 };
 
 // ============================================================
@@ -850,334 +655,10 @@ function killChart(id) {
   } catch(e) { console.warn('killChart:', e); }
 }
 
-function buildCharts(data) {
-  killChart('c1'); killChart('c2'); killChart('c3'); killChart('c4');
-
-  // --- Chart 1: Bar Program vs Target (multi-color) ---
-  var c1Labels = ['Target\nProgram','Program\nSelesai','Upload\nDok'];
-  var c1Data   = [data.totalTarget, data.progDone, data.uploadCount];
-  new Chart(document.getElementById('c1'), {
-    type: 'bar',
-    data: {
-      labels: c1Labels,
-      datasets: [{
-        label: 'Jumlah',
-        data: c1Data,
-        backgroundColor: [COLORS.blue.bg, COLORS.green.bg, COLORS.orange.bg],
-        borderColor:      [COLORS.blue.border, COLORS.green.border, COLORS.orange.border],
-        borderWidth: 2, borderRadius: 8, borderSkipped: false
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: true, aspectRatio: 1.7,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { color: 'rgba(0,0,0,.04)' }, ticks: { color: '#6b7280', font: { size: 9 } } },
-        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,.05)' }, ticks: { color: '#6b7280', font: { size: 9 }, stepSize: 1 } }
-      }
-    }
-  });
-
-  // --- Chart 2: Doughnut Status Program (multi-color) ---
-  var kl = Object.keys(KATEGORI);
-  var doneSet = data.doneSet;
-  var katDone = kl.map(function(k) {
-    return KATEGORI[k].filter(function(n) { return doneSet.has(n); }).length;
-  });
-  var katBelum = kl.map(function(k) {
-    return KATEGORI[k].filter(function(n) { return !doneSet.has(n); }).length;
-  });
-  new Chart(document.getElementById('c2'), {
-    type: 'doughnut',
-    data: {
-      labels: kl,
-      datasets: [{
-        data: katDone,
-        backgroundColor: paletteArr(kl.length, 'bg'),
-        borderColor: paletteArr(kl.length, 'border'),
-        borderWidth: 2, hoverOffset: 6
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: true, aspectRatio: 1.7, cutout: '60%',
-      plugins: {
-        legend: { position: 'bottom', labels: { color: '#374151', font: { size: 9 }, padding: 6 } },
-        tooltip: { callbacks: { label: function(c) { return ' ' + c.label + ': ' + c.parsed + ' selesai'; } } }
-      }
-    }
-  });
-
-  // --- Chart 3: Horizontal Bar per Kategori (multi-color) ---
-  var ktTarget = kl.map(function(k) { return KATEGORI[k].length; });
-  new Chart(document.getElementById('c3'), {
-    type: 'bar',
-    data: {
-      labels: kl,
-      datasets: [
-        {
-          label: 'Selesai',
-          data: katDone,
-          backgroundColor: paletteArr(kl.length, 'bg'),
-          borderColor: paletteArr(kl.length, 'border'),
-          borderWidth: 1, borderRadius: 4, borderSkipped: false
-        },
-        {
-          label: 'Belum',
-          data: katBelum,
-          backgroundColor: 'rgba(0,0,0,.06)',
-          borderColor: 'rgba(0,0,0,.12)',
-          borderWidth: 1, borderRadius: 4, borderSkipped: false
-        }
-      ]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true, maintainAspectRatio: true, aspectRatio: 1.4,
-      plugins: { legend: { position: 'bottom', labels: { color: '#374151', font: { size: 9 }, padding: 6 } } },
-      scales: {
-        x: { beginAtZero: true, stacked: false, grid: { color: 'rgba(0,0,0,.04)' }, ticks: { color: '#6b7280', font: { size: 9 }, stepSize: 1 } },
-        y: { grid: { color: 'rgba(0,0,0,.03)' }, ticks: { color: '#374151', font: { size: 9 } } }
-      }
-    }
-  });
-
-  // --- Chart 4: Tren Aktivitas ---
-  if (filterTahun > 0) {
-    // Per bulan
-    var labels12 = BULAN_NAMA.slice(1);
-    function perBulan(arr, dateGetter) {
-      return labels12.map(function(nm, idx) {
-        var m = idx + 1;
-        return (arr || []).filter(function(item) {
-          var d = toDateObj(dateGetter(item));
-          return d && d.getFullYear() === filterTahun && (d.getMonth() + 1) === m;
-        }).length;
-      });
-    }
-    var setting = data.setting || {};
-    var targetProgBulan = labels12.map(function(nm, idx) {
-      return (setting.progBulan && setting.progBulan[idx + 1]) || 0;
-    });
-    new Chart(document.getElementById('c4'), {
-      type: 'bar',
-      data: {
-        labels: labels12,
-        datasets: [
-          { label: 'Upload', data: perBulan(data.allUps, getUpDate), backgroundColor: COLORS.purple.bg, borderColor: COLORS.purple.border, borderWidth: 2, borderRadius: 4 },
-          { label: 'Target Prog', data: targetProgBulan, type: 'line', borderColor: COLORS.orange.border, backgroundColor: 'transparent', borderWidth: 2, borderDash: [5,4], pointRadius: 3, tension: 0.3 }
-        ]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: true, aspectRatio: 1.7,
-        plugins: { legend: { position: 'bottom', labels: { color: '#374151', font: { size: 9 }, padding: 6 } } },
-        scales: {
-          x: { grid: { color: 'rgba(0,0,0,.04)' }, ticks: { color: '#6b7280', font: { size: 9 } } },
-          y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,.05)' }, ticks: { color: '#6b7280', font: { size: 9 }, stepSize: 1 } }
-        }
-      }
-    });
-  } else {
-    // 7 hari terakhir (line chart)
-    var days = [], dl = [];
-    for (var i = 6; i >= 0; i--) {
-      var dd = new Date(); dd.setDate(dd.getDate() - i);
-      days.push(dd.toISOString().slice(0, 10));
-      dl.push(dd.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric' }));
-    }
-    function perDay(arr, dateGetter) {
-      return days.map(function(day) {
-        return (arr || []).filter(function(item) {
-          var d = toDateObj(dateGetter(item));
-          return d && d.toISOString().slice(0, 10) === day;
-        }).length;
-      });
-    }
-    new Chart(document.getElementById('c4'), {
-      type: 'line',
-      data: {
-        labels: dl,
-        datasets: [
-          { label: 'Upload', data: perDay(data.allUps, getUpDate), borderColor: COLORS.purple.border, backgroundColor: 'rgba(139,92,246,.08)', borderWidth: 2, tension: .35, fill: true, pointRadius: 4, pointBackgroundColor: COLORS.purple.border }
-        ]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: true, aspectRatio: 1.7,
-        plugins: { legend: { position: 'bottom', labels: { color: '#374151', font: { size: 9 }, padding: 6 } } },
-        scales: {
-          x: { grid: { color: 'rgba(0,0,0,.04)' }, ticks: { color: '#6b7280', font: { size: 9 } } },
-          y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,.05)' }, ticks: { color: '#6b7280', font: { size: 9 }, stepSize: 1 } }
-        }
-      }
-    });
-  }
-}
-
-// ============================================================
-// TABEL RINGKASAN PER KATEGORI
-// ============================================================
-function buildSummaryTable(data) {
-  var tbody = document.getElementById('summaryBody');
-  var tfoot = document.getElementById('summaryFoot');
-  if (!tbody) return;
-  var doneSet = data.doneSet;
-  var html = '';
-  var totTarget = 0, totSelesai = 0;
-
-  Object.keys(KATEGORI).forEach(function(kat) {
-    var nos     = KATEGORI[kat];
-    var target  = nos.length;
-    var selesai = nos.filter(function(n) { return doneSet.has(n); }).length;
-    var pct    = target > 0 ? Math.round(selesai / target * 100) : 0;
-    var status = pct >= 100
-      ? '<span class="badge ok">✅ Tercapai</span>'
-      : pct >= 50
-        ? '<span class="badge warn">⏳ Proses</span>'
-        : '<span class="badge notok">❌ Kurang</span>';
-    totTarget += target; totSelesai += selesai;
-    html += '<tr>' +
-      '<td><b>' + esc(kat) + '</b></td>' +
-      '<td style="text-align:center;">' + target + '</td>' +
-      '<td style="text-align:center;"><span class="badge prog">' + selesai + '</span></td>' +
-      '<td style="text-align:center;"><b>' + pct + '%</b></td>' +
-      '<td>' + status + '</td>' +
-    '</tr>';
-  });
-  tbody.innerHTML = html;
-
-  if (tfoot) {
-    var totPct = totTarget > 0 ? Math.round(totSelesai / totTarget * 100) : 0;
-    tfoot.innerHTML = '<tr style="font-weight:900;">' +
-      '<td><b>TOTAL</b></td>' +
-      '<td style="text-align:center;"><b>' + totTarget + '</b></td>' +
-      '<td style="text-align:center;"><b>' + totSelesai + '</b></td>' +
-      '<td style="text-align:center;"><b style="color:#16a34a;">' + totPct + '%</b></td>' +
-      '<td></td>' +
-    '</tr>';
-  }
-}
-
-// ============================================================
-// TABEL BULANAN
-// ============================================================
-function buildBulananTable(data) {
-  var tbody = document.getElementById('bulananBody');
-  var label = document.getElementById('tahunLabel');
-  if (!tbody) return;
-  var tahun  = filterTahun > 0 ? filterTahun : new Date().getFullYear();
-  var setting = data.setting || {};
-  if (label) label.textContent = tahun;
-
-  var html = '';
-  var totP = 0, totU = 0;
-
-  for (var m = 1; m <= 12; m++) {
-    var upsBulanIni = (data.allUps || []).filter(function(x) {
-      var d = toDateObj(getUpDate(x));
-      return d && d.getFullYear() === tahun && d.getMonth() + 1 === m;
-    });
-    var u = upsBulanIni.length;
-    var p = new Set(upsBulanIni.map(function(x) { return x.no; })).size;
-
-    var tProg = (setting.progBulan && setting.progBulan[m]) || 0;
-    var total = u;
-    totP += p; totU += u;
-
-    var nowM = new Date().getMonth() + 1;
-    var nowY = new Date().getFullYear();
-    var isCurrent = (m === nowM && tahun === nowY);
-
-    var statusTxt = '';
-    if (tProg > 0) {
-      var ok = (p >= tProg);
-      statusTxt = ok
-        ? '<span class="badge ok">✅</span>'
-        : '<span class="badge warn">⏳</span>';
-    }
-
-    html += '<tr style="' + (isCurrent ? 'background:rgba(34,197,94,.06);' : '') + '">' +
-      '<td><b' + (isCurrent ? ' style="color:#16a34a;"' : '') + '>' + BULAN_NAMA[m] + '</b>' +
-      (isCurrent ? ' <span class="badge ok" style="font-size:10px;">Bulan ini</span>' : '') + '</td>' +
-      '<td style="text-align:center;">' + (tProg > 0 ? tProg : '<span style="color:#d1d5db;">-</span>') + '</td>' +
-      '<td style="text-align:center;">' + (p > 0 ? '<span class="badge prog">' + p + '</span>' : '<span style="color:#d1d5db;">0</span>') + '</td>' +
-      '<td style="text-align:center;">' + (u > 0 ? '<span class="badge up">' + u + '</span>' : '<span style="color:#d1d5db;">0</span>') + '</td>' +
-      '<td style="text-align:center;"><b>' + total + '</b></td>' +
-      '<td>' + statusTxt + '</td>' +
-    '</tr>';
-  }
-
-  html += '<tr style="border-top:2px solid rgba(34,197,94,.25);font-weight:900;">' +
-    '<td><b>TOTAL ' + tahun + '</b></td>' +
-    '<td></td>' +
-    '<td style="text-align:center;"><b>' + totP + '</b></td>' +
-    '<td style="text-align:center;"><b>' + totU + '</b></td>' +
-    '<td style="text-align:center;"><b style="color:#16a34a;">' + totU + '</b></td>' +
-    '<td></td>' +
-  '</tr>';
-  tbody.innerHTML = html;
-}
-
-// ============================================================
-// REFRESH ALL
-// ============================================================
-var __refreshLock = false;
-function safeRefresh() {
-  if (__refreshLock) return;
-  __refreshLock = true;
-  try { refreshAll(); } finally {
-    setTimeout(function() { __refreshLock = false; }, 300);
-  }
-}
-
-function refreshAll() {
-  try {
-    var data = hitungPencapaian();
-    var setting = data.setting || {};
-
-    var kpi1 = document.getElementById('kpi1');
-    if (kpi1) kpi1.textContent = String(data.progDone || 0);
-    var kpi1sub = document.getElementById('kpi1sub');
-    if (kpi1sub) kpi1sub.textContent = 'dari ' + (setting.totalProg || 30) + ' program';
-
-    var kpi2 = document.getElementById('kpi2');
-    if (kpi2) kpi2.textContent = String(data.pct || 0) + '%';
-
-    var kpi3 = document.getElementById('kpi3');
-    if (kpi3) kpi3.textContent = String((getLS(KU) || []).length);
-
-    var progPct = document.getElementById('progPct');
-    if (progPct) progPct.textContent = String(data.pct || 0) + '%';
-    var progFill = document.getElementById('progFill');
-    if (progFill) progFill.style.width = (data.pct || 0) + '%';
-
-    var progDetail = document.getElementById('progDetail');
-    if (progDetail) {
-      progDetail.innerHTML =
-        'Filter: ' + (filterTahun > 0 ? 'Tahun ' + filterTahun : 'Semua Tahun') +
-        (filterBulan > 0 ? ' | Bulan ' + BULAN_NAMA[filterBulan] : '') +
-        ' &nbsp;|&nbsp; Program selesai: ' + data.progDone + '/' + (setting.totalProg || 30) +
-        ' &nbsp;|&nbsp; Upload Dokumen: ' + data.uploadCount + '/' + (setting.totalProg || 30);
-    }
-
-    buildCharts(data);
-    buildSummaryTable(data);
-    buildBulananTable(data);
-  } catch(e) {
-    console.error('refreshAll error:', e);
-  }
-}
 
 // ============================================================
 // SUPABASE SYNC
 // ============================================================
-function safeParseJSON(maybe) {
-  try {
-    if (maybe === null || maybe === undefined) return [];
-    if (Array.isArray(maybe)) return maybe;
-    if (typeof maybe === 'string') { if (!maybe.trim()) return []; return JSON.parse(maybe); }
-    return JSON.parse(JSON.stringify(maybe));
-  } catch(e) { return []; }
-}
-
 function mergeAndSetLS(key, incomingArr, sigFn) {
   try {
     var local = getLS(key) || [];
@@ -1187,749 +668,453 @@ function mergeAndSetLS(key, incomingArr, sigFn) {
     var merged = Array.from(map.values()).sort(function(a, b) {
       return new Date(b.at || b.created_at || 0) - new Date(a.at || a.created_at || 0);
     });
-    setLS(key, merged.slice(0, 300));
+    setLS(key, merged.slice(0, 1000));
   } catch(e) {
-    setLS(key, (incomingArr || []).slice(0, 300));
+    setLS(key, (incomingArr || []).slice(0, 1000));
   }
 }
 
 var __syncLock = false;
 function safeLoadFromSupabase() {
-  if (__syncLock || !db) return;
+  if (__syncLock) return;
   __syncLock = true;
   loadFromSupabase().catch(function(e) { console.error('sync error:', e); })
     .finally(function() { __syncLock = false; });
 }
 
+// Ambil data komisioning dari Neon (via /api/komisioning) dan gabungkan
+// dengan data lokal, supaya dashboard tetap terisi walau offline.
 function loadFromSupabase() {
-  if (!navigator.onLine || !db) { refreshAll(); return Promise.resolve(); }
+  if (!navigator.onLine) { return Promise.resolve(); }
 
-  var p3 = db.from('upload').select('*').order('created_at', { ascending: false })
-    .then(function(res) {
-      if (res.error) { console.error('upload:', res.error); return; }
-      if (res.data && res.data.length) {
-        var incoming = res.data.map(function(x) {
-          return {
-            no: x.no, title: x.title, at: x.created_at,
-            tglUpload: x.tgl_upload,
-            file: { name: x.file_name, type: x.file_type }
-          };
-        });
-        mergeAndSetLS(KU, incoming, function(r) {
-          return [r.no||'', (r.file&&r.file.name)||'', r.tglUpload||''].join('|');
-        });
-        refreshAll();
-      }
-    }).catch(function(e) { console.error(e); });
-
-  return Promise.all([p3]);
-}
-
-// ============================================================
-// UPLOAD DOKUMEN — FIX
-// ============================================================
-var ddReady = false;
-function initDD() {
-  if (ddReady) return; ddReady = true;
-  var list = document.getElementById('ddList');
-  var btn  = document.getElementById('ddBtn');
-  var val  = document.getElementById('ddVal');
-  var txt  = document.getElementById('ddText');
-  if (!list || !btn) return;
-
-  for (var i = 1; i <= 30; i++) {
-    (function(n) {
-      var item = document.createElement('div');
-      item.className = 'dd-item';
-      item.textContent = 'Program ' + n + ' - ' + TITLES[n];
-      item.addEventListener('click', function() {
-        val.value = n;
-        txt.textContent = 'Program ' + n + ' - ' + TITLES[n];
-        list.querySelectorAll('.dd-item').forEach(function(x) { x.classList.remove('sel'); });
-        item.classList.add('sel');
-        list.classList.remove('open');
+  return komApi.list().then(function(res) {
+      if (res.error) { console.error('komisioning fetch:', res.error); return; }
+      var incoming = (res.data || []).map(function(x) {
+        return {
+          id: x.id, namaUnit: x.nama_unit, nomorUnit: x.nomor_unit,
+          kategori: x.kategori, lokasiArea: x.lokasi_area,
+          petugas: x.petugas_komisioning, noSertifikat: x.no_sertifikat,
+          tglKomisioning: x.tanggal_komisioning, tglBerakhir: x.tanggal_berakhir,
+          fileDokumen: x.file_dokumen, catatan: x.catatan, at: x.created_at
+        };
       });
-      list.appendChild(item);
-    })(i);
-  }
-  btn.addEventListener('click', function(e) { e.stopPropagation(); list.classList.toggle('open'); });
-  document.addEventListener('click', function() { list.classList.remove('open'); });
-
-  // File info preview
-  var fileEl = document.getElementById('upFile');
-  if (fileEl) {
-    fileEl.addEventListener('change', function() {
-      var info = document.getElementById('upFileInfo');
-      if (!info) return;
-      if (fileEl.files && fileEl.files[0]) {
-        var f = fileEl.files[0];
-        var size = (f.size / 1024).toFixed(1);
-        info.textContent = '📎 ' + f.name + ' (' + size + ' KB)';
-        if (f.size > 5 * 1024 * 1024) {
-          info.textContent += ' ⚠️ File terlalu besar (maks 5MB)';
-        }
-      } else {
-        info.textContent = 'Belum ada file dipilih.';
-      }
-    });
-  }
+      mergeAndSetLS(KKOM, incoming, function(r) { return String(r.id); });
+      if (currentView === 'komisioning') renderKomisioning();
+    })
+    .catch(function(e) { console.error('loadFromSupabase komisioning:', e); });
 }
 
-function resetUpload() {
-  var ddVal = document.getElementById('ddVal');
-  var ddTxt = document.getElementById('ddText');
-  var upFile = document.getElementById('upFile');
-  var upHint = document.getElementById('upHint');
-  var upInfo = document.getElementById('upFileInfo');
-  if (ddVal) ddVal.value = 0;
-  if (ddTxt) ddTxt.textContent = 'Pilih program...';
-  if (upFile) upFile.value = '';
-  if (upHint) upHint.textContent = 'Form upload direset.';
-  if (upInfo) upInfo.textContent = 'Belum ada file dipilih.';
-  var ddList = document.getElementById('ddList');
-  if (ddList) ddList.querySelectorAll('.dd-item').forEach(function(x) { x.classList.remove('sel'); });
-  fillDateSelects('upTgl', 'upBln', 'upThn');
+// ============================================================
+// KOMISIONING UNIT
+// ============================================================
+var KOM_MASA_BULAN = 6;
+var KOM_H_WARNING  = 30;
+var komSelectedId  = null;
+var komEditMode    = false;
+
+function addMonthsISO(iso, n) {
+  var d = toDateObj(iso);
+  if (!d) return null;
+  var nd = new Date(d.getFullYear(), d.getMonth() + n, d.getDate());
+  var mm = (nd.getMonth() + 1) < 10 ? '0' + (nd.getMonth() + 1) : String(nd.getMonth() + 1);
+  var dd = nd.getDate() < 10 ? '0' + nd.getDate() : String(nd.getDate());
+  return nd.getFullYear() + '-' + mm + '-' + dd;
 }
 
-// Kompres foto (dipakai agar foto upload bisa disimpan & dipakai di lampiran PPT)
-function compressImageFile(file, maxW, maxH, quality) {
-  return new Promise(function(resolve) {
-    var img = new Image();
-    var url = URL.createObjectURL(file);
-    img.onload = function() {
-      var canvas = document.createElement('canvas');
-      var w = img.width, h = img.height;
-      if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
-      if (h > maxH) { w = Math.round(w * maxH / h); h = maxH; }
-      canvas.width = w; canvas.height = h;
-      var ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
-      var data = canvas.toDataURL('image/jpeg', quality || 0.7);
-      URL.revokeObjectURL(url);
-      resolve(data);
-    };
-    img.onerror = function() { URL.revokeObjectURL(url); resolve(null); };
-    img.src = url;
+function hitungStatusKom(tglBerakhir) {
+  var akhir = toDateObj(tglBerakhir);
+  if (!akhir) return 'Aktif';
+  var today = new Date(); today.setHours(0,0,0,0);
+  akhir.setHours(0,0,0,0);
+  var diffDays = Math.round((akhir - today) / 86400000);
+  if (diffDays < 0) return 'Kadaluarsa';
+  if (diffDays <= KOM_H_WARNING) return 'Mendekati Kadaluarsa';
+  return 'Aktif';
+}
+
+function komBadge(status) {
+  if (status === 'Aktif') return '<span class="badge ok">✅ Aktif</span>';
+  if (status === 'Mendekati Kadaluarsa') return '<span class="badge warn">⏳ H-' + KOM_H_WARNING + '</span>';
+  return '<span class="badge notok">❌ Kadaluarsa</span>';
+}
+
+function getKomAll() { return getLS(KKOM); }
+
+// Ambil satu record terbaru (berdasarkan tanggal komisioning) per nomor unit,
+// mewakili status unit saat ini di dashboard/tabel utama.
+function getKomLatestPerUnit() {
+  var all = getKomAll();
+  var map = new Map();
+  all.forEach(function(r) {
+    var key = (r.nomorUnit || '').trim().toLowerCase() || ('id-' + r.id);
+    var cur = map.get(key);
+    if (!cur || new Date(r.tglKomisioning) > new Date(cur.tglKomisioning)) map.set(key, r);
   });
+  return Array.from(map.values());
 }
 
-// FIX: doUpload — perbaikan anti-double & update localStorage benar
-// Kini menyimpan data gambar (dikompres) agar dapat ditampilkan sebagai
-// lampiran foto dokumentasi implementasi program pada Export PPT.
-function doUpload() {
-  var hint  = document.getElementById('upHint');
-  var no    = Number(document.getElementById('ddVal').value);
-  var fEl   = document.getElementById('upFile');
-  var file  = fEl && fEl.files && fEl.files[0];
-  var tglUpload = getDateFromSelects('upTgl', 'upBln', 'upThn');
+function getKomHistory(nomorUnit) {
+  var key = (nomorUnit || '').trim().toLowerCase();
+  return getKomAll()
+    .filter(function(r) { return (r.nomorUnit || '').trim().toLowerCase() === key; })
+    .sort(function(a, b) { return new Date(b.tglKomisioning) - new Date(a.tglKomisioning); });
+}
 
-  if (!no)       { hint.textContent = '❌ Pilih program dulu.'; return; }
-  if (!tglUpload){ hint.textContent = '❌ Pilih tanggal upload dulu.'; return; }
-  if (!file)     { hint.textContent = '❌ Pilih file dulu.'; return; }
-  if (file.size > 5 * 1024 * 1024) { hint.textContent = '❌ File terlalu besar (maks 5MB).'; return; }
+function fillKomFilterOptions() {
+  var all = getKomLatestPerUnit();
+  var kats = Array.from(new Set(all.map(function(x) { return (x.kategori || '').trim(); }).filter(Boolean))).sort();
+  var loks = Array.from(new Set(all.map(function(x) { return (x.lokasiArea || '').trim(); }).filter(Boolean))).sort();
 
-  hint.textContent = '⏳ Menyimpan...';
+  var fKat = document.getElementById('komFKategori');
+  if (fKat) {
+    var curKat = fKat.value;
+    fKat.innerHTML = '<option value="">Semua Kategori</option>' + kats.map(function(k) { return '<option value="' + esc(k) + '">' + esc(k) + '</option>'; }).join('');
+    fKat.value = curKat;
+  }
+  var fLok = document.getElementById('komFLokasi');
+  if (fLok) {
+    var curLok = fLok.value;
+    fLok.innerHTML = '<option value="">Semua Lokasi</option>' + loks.map(function(l) { return '<option value="' + esc(l) + '">' + esc(l) + '</option>'; }).join('');
+    fLok.value = curLok;
+  }
+}
 
-  var isImage = file.type && file.type.indexOf('image/') === 0;
-  var photoPromise = isImage ? compressImageFile(file, 900, 900, 0.7) : Promise.resolve(null);
-
-  photoPromise.then(function(photoData) {
-    try {
-      var rec = {
-        no: no, title: TITLES[no],
-        at: new Date().toISOString(),
-        tglUpload: tglUpload,
-        file: { name: file.name, type: file.type, size: file.size, data: photoData || null }
-      };
-
-      var arr = getLS(KU);
-      // Anti-double: cek no + nama file + tanggal
-      var sig = no + '|' + file.name + '|' + tglUpload;
-      var isDup = arr.some(function(x) {
-        return (x.no + '|' + (x.file && x.file.name) + '|' + x.tglUpload) === sig;
-      });
-      if (isDup) {
-        hint.textContent = '⚠️ File ini sudah pernah diupload (anti-double).';
-        return;
-      }
-
-      arr.unshift(rec);
-      setLS(KU, arr.slice(0, 200));
-
-      // Kirim ke Supabase (tanpa base64, terlalu besar untuk kolom biasa)
-      if (navigator.onLine && db) {
-        db.from('upload').insert({
-          no: no, title: TITLES[no],
-          file_name: file.name, file_type: file.type,
-          tgl_upload: tglUpload
-        }).then(function(res) {
-          if (res && res.error) console.error('upload supabase:', res.error);
-        }).catch(function(e) { console.error(e); });
-      }
-
-      hint.textContent = '✅ Upload tersimpan! Tanggal: ' + fmtDateOnly(tglUpload);
-      showToast('Upload dokumen berhasil! Program ' + no);
-      refreshAll(); // FIX: langsung refresh dashboard
-      renderHistory(); // FIX: update riwayat juga
-    } catch(err) {
-      console.error('doUpload error:', err);
-      hint.textContent = '❌ Gagal menyimpan: ' + err.message;
+var komChartRef = null;
+function buildKomChart(counts) {
+  killChart('komChart');
+  var canvas = document.getElementById('komChart');
+  if (!canvas) return;
+  new Chart(canvas, {
+    type: 'doughnut',
+    data: {
+      labels: ['Aktif', 'Mendekati Kadaluarsa', 'Kadaluarsa'],
+      datasets: [{
+        data: [counts.aktif, counts.warn, counts.expired],
+        backgroundColor: [COLORS.green.bg, COLORS.yellow.bg, COLORS.red.bg],
+        borderColor: [COLORS.green.border, COLORS.yellow.border, COLORS.red.border],
+        borderWidth: 2, hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true, aspectRatio: 1.3, cutout: '60%',
+      plugins: { legend: { position: 'bottom', labels: { color: '#374151', font: { size: 9 }, padding: 6 } } }
     }
   });
 }
 
-// ============================================================
-// RIWAYAT UPLOAD
-// ============================================================
-function renderHistory() {
-  var body = document.getElementById('histBody');
+function renderKomisioning() {
+  fillKomFilterOptions();
+  var all = getKomLatestPerUnit();
+
+  var search = ((document.getElementById('komSearch') || {}).value || '').trim().toLowerCase();
+  var fStatus = (document.getElementById('komFStatus') || {}).value || '';
+  var fKategori = (document.getElementById('komFKategori') || {}).value || '';
+  var fLokasi = (document.getElementById('komFLokasi') || {}).value || '';
+
+  var withStatus = all.map(function(r) {
+    return Object.assign({}, r, { statusNow: hitungStatusKom(r.tglBerakhir) });
+  });
+
+  var counts = { aktif: 0, warn: 0, expired: 0 };
+  withStatus.forEach(function(r) {
+    if (r.statusNow === 'Aktif') counts.aktif++;
+    else if (r.statusNow === 'Mendekati Kadaluarsa') counts.warn++;
+    else counts.expired++;
+  });
+
+  var kTotal = document.getElementById('komKpiTotal'); if (kTotal) kTotal.textContent = String(withStatus.length);
+  var kAktif = document.getElementById('komKpiAktif'); if (kAktif) kAktif.textContent = String(counts.aktif);
+  var kWarn  = document.getElementById('komKpiWarn');  if (kWarn) kWarn.textContent = String(counts.warn);
+  var kExp   = document.getElementById('komKpiExpired'); if (kExp) kExp.textContent = String(counts.expired);
+
+  buildKomChart(counts);
+
+  var filtered = withStatus.filter(function(r) {
+    if (fStatus && r.statusNow !== fStatus) return false;
+    if (fKategori && (r.kategori || '') !== fKategori) return false;
+    if (fLokasi && (r.lokasiArea || '') !== fLokasi) return false;
+    if (search) {
+      var hay = ((r.namaUnit || '') + ' ' + (r.nomorUnit || '')).toLowerCase();
+      if (hay.indexOf(search) === -1) return false;
+    }
+    return true;
+  }).sort(function(a, b) { return new Date(a.tglBerakhir) - new Date(b.tglBerakhir); });
+
+  var body = document.getElementById('komBody');
   if (!body) return;
-  var arr = getLS(KU);
-  if (!arr.length) {
-    body.innerHTML = '<tr><td colspan="5" style="color:#9ca3af;padding:16px;text-align:center;">Belum ada upload.</td></tr>';
+  if (!filtered.length) {
+    body.innerHTML = '<tr><td colspan="8" style="color:#9ca3af;padding:16px;text-align:center;">Belum ada data / tidak ada yang cocok dengan filter.</td></tr>';
     return;
   }
-  body.innerHTML = arr.slice(0, 100).map(function(x) {
-    var tglTampil = x.tglUpload ? fmtDateOnly(x.tglUpload) : fmtDate(x.at);
+  body.innerHTML = filtered.map(function(r) {
     return '<tr>' +
-      '<td style="white-space:nowrap;">' + esc(tglTampil) + '</td>' +
-      '<td><span class="badge up">P' + esc(x.no) + '</span></td>' +
-      '<td style="white-space:normal;max-width:200px;">' + esc(x.title || '-') + '</td>' +
-      '<td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;">' + esc((x.file && x.file.name) || '-') + '</td>' +
-      '<td>' + esc((x.file && x.file.type) || '-') + '</td>' +
+      '<td>' + esc(r.namaUnit) + '</td>' +
+      '<td><b>' + esc(r.nomorUnit) + '</b></td>' +
+      '<td>' + esc(r.kategori || '-') + '</td>' +
+      '<td>' + esc(r.lokasiArea || '-') + '</td>' +
+      '<td style="white-space:nowrap;">' + fmtDateOnly(r.tglKomisioning) + '</td>' +
+      '<td style="white-space:nowrap;">' + fmtDateOnly(r.tglBerakhir) + '</td>' +
+      '<td>' + komBadge(r.statusNow) + '</td>' +
+      '<td style="white-space:nowrap;"><button class="btn sm" onclick="openKomDetail(\'' + r.id + '\')">Detail</button></td>' +
     '</tr>';
   }).join('');
 }
 
-function clearUploads() {
-  if (!confirm('Hapus semua riwayat upload di perangkat ini?')) return;
-  setLS(KU, []);
-  renderHistory();
-  refreshAll();
-  showToast('Semua riwayat upload dihapus.');
+function resetKomFilter() {
+  var s = document.getElementById('komSearch'); if (s) s.value = '';
+  var a = document.getElementById('komFStatus'); if (a) a.value = '';
+  var b = document.getElementById('komFKategori'); if (b) b.value = '';
+  var c = document.getElementById('komFLokasi'); if (c) c.value = '';
+  renderKomisioning();
 }
 
-// ============================================================
-// SETTING TARGET
-// ============================================================
-function initSetting() {
-  // Isi tahun select
-  var selThn = document.getElementById('settingTahun');
-  if (selThn && !selThn.options.length) {
-    var now = new Date().getFullYear();
-    for (var y = now - 2; y <= now + 3; y++) {
-      var o = document.createElement('option');
-      o.value = y; o.textContent = String(y);
-      if (y === now) o.selected = true;
-      selThn.appendChild(o);
+// ---- Form Tambah / Edit ----
+function openKomForm(editId) {
+  komEditMode = !!editId;
+  document.getElementById('komFormTitle').textContent = komEditMode ? 'Edit Unit Komisioning' : 'Tambah Unit Komisioning';
+  document.getElementById('kom_id').value = '';
+  document.getElementById('kom_riwayatOf').value = '';
+  ['kom_namaUnit','kom_nomorUnit','kom_kategori','kom_lokasiArea','kom_petugas','kom_noSertifikat','kom_catatan'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('kom_tglBerakhir').value = '-';
+  document.getElementById('kom_file').value = '';
+  document.getElementById('kom_fileInfo').textContent = 'Belum ada file dipilih.';
+  document.getElementById('komFormHint').textContent = '';
+  fillDateSelects('kom_tgl_d', 'kom_tgl_m', 'kom_tgl_y');
+
+  if (komEditMode) {
+    var rec = getKomAll().find(function(x) { return String(x.id) === String(editId); });
+    if (rec) {
+      document.getElementById('kom_id').value = rec.id;
+      document.getElementById('kom_namaUnit').value = rec.namaUnit || '';
+      document.getElementById('kom_nomorUnit').value = rec.nomorUnit || '';
+      document.getElementById('kom_kategori').value = rec.kategori || '';
+      document.getElementById('kom_lokasiArea').value = rec.lokasiArea || '';
+      document.getElementById('kom_petugas').value = rec.petugas || '';
+      document.getElementById('kom_noSertifikat').value = rec.noSertifikat || '';
+      document.getElementById('kom_catatan').value = rec.catatan || '';
+      document.getElementById('kom_tglBerakhir').value = fmtDateOnly(rec.tglBerakhir);
+      if (rec.tglKomisioning) {
+        var p = rec.tglKomisioning.split('-');
+        document.getElementById('kom_tgl_y').value = p[0];
+        document.getElementById('kom_tgl_m').value = String(Number(p[1]));
+        document.getElementById('kom_tgl_d').value = String(Number(p[2]));
+      }
+      if (rec.fileDokumen) document.getElementById('kom_fileInfo').textContent = '📎 ' + rec.fileDokumen;
     }
   }
-  renderSettingTable();
-}
 
-function renderSettingTable() {
-  var setting = getSetting();
-  var tahun   = Number((document.getElementById('settingTahun') || {}).value || new Date().getFullYear());
+  var tglEls = ['kom_tgl_d','kom_tgl_m','kom_tgl_y'];
+  tglEls.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.onchange = updateKomTglBerakhirPreview;
+  });
+  updateKomTglBerakhirPreview();
 
-  // Total
-  var totProgEl = document.getElementById('settingTotalProg');
-  if (totProgEl) totProgEl.value = setting.totalProg || 30;
-
-  // Grid Target Program per Bulan
-  var pgGrid = document.getElementById('targetProgGrid');
-  if (pgGrid) {
-    var html = '';
-    for (var m = 1; m <= 12; m++) {
-      var val = (setting.progBulan && setting.progBulan[m]) || 0;
-      html += '<div class="target-card">' +
-        '<div class="tc-label">' + BULAN_NAMA[m] + '</div>' +
-        '<input type="number" id="tProg_' + m + '" value="' + val + '" min="0" max="30" ' +
-        'placeholder="0" style="text-align:center;font-weight:700;"/>' +
-        '</div>';
-    }
-    pgGrid.innerHTML = html;
-  }
-
-  renderSettingPreview(setting, tahun);
-}
-
-function saveSetting() {
-  var hint     = document.getElementById('settingHint');
-  var tahun    = Number((document.getElementById('settingTahun') || {}).value || new Date().getFullYear());
-  var totProg  = Number((document.getElementById('settingTotalProg') || {}).value || 30);
-
-  var progBulan = {};
-  for (var m = 1; m <= 12; m++) {
-    var pEl = document.getElementById('tProg_' + m);
-    progBulan[m] = pEl ? Number(pEl.value) || 0 : 0;
-  }
-
-  var setting = {
-    totalProg: totProg,
-    progBulan: progBulan,
-    updatedAt: new Date().toISOString()
+  var fileEl = document.getElementById('kom_file');
+  fileEl.onchange = function() {
+    var info = document.getElementById('kom_fileInfo');
+    if (fileEl.files && fileEl.files[0]) info.textContent = '📎 ' + fileEl.files[0].name;
   };
 
-  setObjLS(KT, setting);
-  if (hint) hint.textContent = '✅ Setting target tersimpan! (' + new Date().toLocaleString('id-ID') + ')';
-  showToast('Setting target berhasil disimpan!');
-  renderSettingPreview(setting, tahun);
-  refreshAll(); // Update dashboard dengan target baru
+  document.getElementById('komFormStep').style.display = 'block';
+  document.getElementById('komPreviewStep').style.display = 'none';
+  document.getElementById('komFormFootStep1').style.display = 'flex';
+  document.getElementById('komFormFootStep2').style.display = 'none';
+  document.getElementById('komFormModal').classList.add('show');
 }
 
-function resetSetting() {
-  if (!confirm('Reset setting ke default?')) return;
-  var def = { totalProg: 30, progBulan: {} };
-  setObjLS(KT, def);
-  renderSettingTable();
-  refreshAll();
-  showToast('Setting direset ke default.', 'info');
+function updateKomTglBerakhirPreview() {
+  var tgl = getDateFromSelects('kom_tgl_d', 'kom_tgl_m', 'kom_tgl_y');
+  var el = document.getElementById('kom_tglBerakhir');
+  if (!el) return;
+  el.value = tgl ? fmtDateOnly(addMonthsISO(tgl, KOM_MASA_BULAN)) : '-';
 }
 
-function renderSettingPreview(setting, tahun) {
-  var tbody = document.getElementById('settingPreviewBody');
-  if (!tbody) return;
-  var allUps = getLS(KU);
-  var html = '';
-
-  for (var m = 1; m <= 12; m++) {
-    var tProg = (setting.progBulan && setting.progBulan[m]) || 0;
-
-    var upsBulanIni = allUps.filter(function(x) {
-      var d = toDateObj(getUpDate(x));
-      return d && d.getFullYear() === tahun && d.getMonth() + 1 === m;
-    });
-    var aProg = new Set(upsBulanIni.map(function(x) { return x.no; })).size;
-
-    var pctP = tProg > 0 ? Math.round(aProg / tProg * 100) : (aProg > 0 ? 100 : 0);
-
-    var nowM = new Date().getMonth() + 1;
-    var nowY = new Date().getFullYear();
-    var isCurrent = (m === nowM && tahun === nowY);
-
-    var statusBadge = '';
-    if (tProg > 0) {
-      var allMet = (aProg >= tProg);
-      statusBadge = allMet
-        ? '<span class="badge ok">✅ Tercapai</span>'
-        : (aProg > 0)
-          ? '<span class="badge warn">⏳ Proses</span>'
-          : '<span class="badge na">—</span>';
-    }
-
-    html += '<tr style="' + (isCurrent ? 'background:rgba(34,197,94,.05);' : '') + '">' +
-      '<td><b>' + BULAN_NAMA[m] + (isCurrent ? ' <span class="badge ok" style="font-size:10px;">Ini</span>' : '') + '</b></td>' +
-      '<td style="text-align:center;">' + (tProg || '—') + '</td>' +
-      '<td style="text-align:center;">' + (aProg > 0 ? '<span class="badge prog">' + aProg + '</span>' : '0') + '</td>' +
-      '<td style="text-align:center;"><b>' + pctP + '%</b></td>' +
-      '<td>' + statusBadge + '</td>' +
-    '</tr>';
-  }
-  tbody.innerHTML = html;
+function closeKomForm() {
+  document.getElementById('komFormModal').classList.remove('show');
 }
 
-// ============================================================
-// EXPORT PPT
-// ============================================================
-function exportPPT() {
-  showToast('Membuat file PPT...', 'info');
+function showKomPreview() {
+  var hint = document.getElementById('komFormHint');
+  var namaUnit = document.getElementById('kom_namaUnit').value.trim();
+  var nomorUnit = document.getElementById('kom_nomorUnit').value.trim();
+  var petugas = document.getElementById('kom_petugas').value.trim();
+  var noSertifikat = document.getElementById('kom_noSertifikat').value.trim();
+  var tglKomisioning = getDateFromSelects('kom_tgl_d', 'kom_tgl_m', 'kom_tgl_y');
 
-  try {
-    var pptx = new PptxGenJS();
-    pptx.layout = 'LAYOUT_WIDE';
-    pptx.title  = 'KPP Mining Safety Dashboard';
-    pptx.subject = 'Laporan Program Kerja Plant Safety';
+  if (!namaUnit) { hint.textContent = '❌ Nama unit wajib diisi.'; return; }
+  if (!nomorUnit) { hint.textContent = '❌ Nomor unit wajib diisi.'; return; }
+  if (!tglKomisioning) { hint.textContent = '❌ Tanggal komisioning wajib diisi.'; return; }
+  if (!petugas) { hint.textContent = '❌ Petugas komisioning wajib diisi.'; return; }
+  if (!noSertifikat) { hint.textContent = '❌ Nomor sertifikat wajib diisi.'; return; }
+  hint.textContent = '';
 
-    var data    = hitungPencapaian();
-    var setting = data.setting || {};
-    var tahun   = filterTahun > 0 ? filterTahun : new Date().getFullYear();
-    var bulanStr = filterBulan > 0 ? BULAN_NAMA[filterBulan] + ' ' + tahun : 'Tahun ' + tahun;
+  var tglBerakhir = addMonthsISO(tglKomisioning, KOM_MASA_BULAN);
+  var status = hitungStatusKom(tglBerakhir);
+  var kategori = document.getElementById('kom_kategori').value.trim();
+  var lokasiArea = document.getElementById('kom_lokasiArea').value.trim();
+  var catatan = document.getElementById('kom_catatan').value.trim();
+  var fileEl = document.getElementById('kom_file');
+  var fileName = (fileEl.files && fileEl.files[0]) ? fileEl.files[0].name : (komEditMode ? ((getKomAll().find(function(x){return String(x.id)===document.getElementById('kom_id').value;})||{}).fileDokumen || '') : '');
 
-    // Warna tema
-    var C_GREEN  = '22c55e';
-    var C_DARK   = '14532d';
-    var C_LIGHT  = 'f0fdf4';
-    var C_BLUE   = '3b82f6';
-    var C_PURPLE = '8b5cf6';
-    var C_ORANGE = 'f97316';
-    var C_GRAY   = '6b7280';
-    var C_WHITE  = 'FFFFFF';
+  var rows = [
+    ['Nama Unit', namaUnit], ['Nomor Unit', nomorUnit], ['Kategori', kategori || '-'],
+    ['Lokasi/Area', lokasiArea || '-'], ['Petugas Komisioning', petugas], ['No. Sertifikat', noSertifikat],
+    ['Tanggal Komisioning', fmtDateOnly(tglKomisioning)], ['Tanggal Berakhir', fmtDateOnly(tglBerakhir)],
+    ['Status', ''], ['Dokumen', fileName || '-'], ['Catatan', catatan || '-']
+  ];
+  var html = rows.map(function(r) {
+    if (r[0] === 'Status') return '<div class="kv-row"><span class="k">' + r[0] + '</span><span class="v">' + komBadge(status) + '</span></div>';
+    return '<div class="kv-row"><span class="k">' + esc(r[0]) + '</span><span class="v">' + esc(r[1]) + '</span></div>';
+  }).join('');
+  document.getElementById('komPreviewBody').innerHTML = html;
 
-    function addBg(slide, color) {
-      slide.background = { color: color || C_LIGHT };
-    }
+  document.getElementById('komFormStep').style.display = 'none';
+  document.getElementById('komPreviewStep').style.display = 'block';
+  document.getElementById('komFormFootStep1').style.display = 'none';
+  document.getElementById('komFormFootStep2').style.display = 'flex';
+}
 
-    // ---- SLIDE 1: Cover ----
-    var s1 = pptx.addSlide();
-    addBg(s1, '14532d');
-    s1.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: '100%', h: '100%', fill: { color: '14532d' } });
-    s1.addShape(pptx.ShapeType.rect, { x: 0, y: 3.5, w: '100%', h: 0.08, fill: { color: C_GREEN } });
-    s1.addText('⛏ KPP MINING', {
-      x: 0.5, y: 0.4, w: 11, h: 0.7,
-      fontSize: 18, bold: true, color: C_GREEN, align: 'center'
-    });
-    s1.addText('SAFETY DASHBOARD', {
-      x: 0.5, y: 1.1, w: 11, h: 1.2,
-      fontSize: 38, bold: true, color: C_WHITE, align: 'center'
-    });
-    s1.addText('Laporan Program Kerja Plant Safety', {
-      x: 0.5, y: 2.4, w: 11, h: 0.5,
-      fontSize: 16, color: 'bbf7d0', align: 'center', italic: true
-    });
-    s1.addText('Periode: ' + bulanStr, {
-      x: 0.5, y: 3.7, w: 11, h: 0.5,
-      fontSize: 14, color: C_GREEN, align: 'center', bold: true
-    });
-    s1.addText('Dibuat: ' + new Date().toLocaleDateString('id-ID', { weekday:'long', year:'numeric', month:'long', day:'numeric' }), {
-      x: 0.5, y: 4.4, w: 11, h: 0.4,
-      fontSize: 12, color: '86efac', align: 'center'
-    });
-    s1.addText('Confidential — Internal Use Only', {
-      x: 0.5, y: 5.1, w: 11, h: 0.35,
-      fontSize: 10, color: '4ade80', align: 'center', italic: true
-    });
+function backToKomForm() {
+  document.getElementById('komFormStep').style.display = 'block';
+  document.getElementById('komPreviewStep').style.display = 'none';
+  document.getElementById('komFormFootStep1').style.display = 'flex';
+  document.getElementById('komFormFootStep2').style.display = 'none';
+}
 
-    // ---- SLIDE 2: KPI Summary ----
-    var s2 = pptx.addSlide();
-    addBg(s2, C_LIGHT);
-    s2.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: '100%', h: 0.8, fill: { color: C_DARK } });
-    s2.addText('📊 RINGKASAN KPI — ' + bulanStr.toUpperCase(), {
-      x: 0.3, y: 0.1, w: 11, h: 0.6,
-      fontSize: 16, bold: true, color: C_WHITE
-    });
+function submitKomisioning() {
+  var id = document.getElementById('kom_id').value;
+  var namaUnit = document.getElementById('kom_namaUnit').value.trim();
+  var nomorUnit = document.getElementById('kom_nomorUnit').value.trim();
+  var kategori = document.getElementById('kom_kategori').value.trim();
+  var lokasiArea = document.getElementById('kom_lokasiArea').value.trim();
+  var petugas = document.getElementById('kom_petugas').value.trim();
+  var noSertifikat = document.getElementById('kom_noSertifikat').value.trim();
+  var catatan = document.getElementById('kom_catatan').value.trim();
+  var tglKomisioning = getDateFromSelects('kom_tgl_d', 'kom_tgl_m', 'kom_tgl_y');
+  var tglBerakhir = addMonthsISO(tglKomisioning, KOM_MASA_BULAN);
+  var fileEl = document.getElementById('kom_file');
+  var fileName = (fileEl.files && fileEl.files[0]) ? fileEl.files[0].name : null;
 
-    var kpiData = [
-      { label: 'Program Selesai', val: data.progDone + ' / ' + (setting.totalProg || 30), color: C_GREEN, icon: '✅' },
-      { label: 'Pencapaian (Upload vs Target)', val: data.pct + '%',        color: C_BLUE,   icon: '📈' },
-      { label: 'Upload Dokumen',  val: (getLS(KU)||[]).length, color: C_ORANGE, icon: '📁' }
-    ];
+  var arr = getKomAll();
 
-    kpiData.forEach(function(k, i) {
-      var x = 0.3 + (i * 3.8);
-      s2.addShape(pptx.ShapeType.roundRect, {
-        x: x, y: 1.0, w: 3.6, h: 1.6,
-        fill: { color: C_WHITE },
-        line: { color: k.color, width: 2 },
-        rectRadius: 0.1
-      });
-      s2.addText(k.icon, { x: x, y: 1.05, w: 3.6, h: 0.5, fontSize: 20, align: 'center' });
-      s2.addText(String(k.val), {
-        x: x, y: 1.55, w: 3.6, h: 0.55,
-        fontSize: 26, bold: true, color: k.color, align: 'center'
-      });
-      s2.addText(k.label, {
-        x: x, y: 2.1, w: 3.6, h: 0.4,
-        fontSize: 10, color: C_GRAY, align: 'center', bold: true
-      });
-    });
-
-    // Progress bar visual
-    s2.addText('📈 Pencapaian Total (Upload Dokumen vs Target Program)', {
-      x: 0.3, y: 2.8, w: 8, h: 0.35,
-      fontSize: 12, bold: true, color: C_DARK
-    });
-    s2.addText(data.pct + '%', {
-      x: 8.3, y: 2.8, w: 3.5, h: 0.35,
-      fontSize: 12, bold: true, color: C_GREEN, align: 'right'
-    });
-    // Track
-    s2.addShape(pptx.ShapeType.rect, { x: 0.3, y: 3.2, w: 11.4, h: 0.25, fill: { color: 'e5e7eb' }, line: { color: 'e5e7eb' } });
-    // Fill
-    var fillW = Math.max(0.1, 11.4 * (data.pct / 100));
-    s2.addShape(pptx.ShapeType.rect, { x: 0.3, y: 3.2, w: fillW, h: 0.25, fill: { color: C_GREEN }, line: { color: C_GREEN } });
-
-    s2.addText('Filter: ' + bulanStr + ' | Program: ' + data.progDone + '/' + (setting.totalProg||30) + ' | Upload: ' + (getLS(KU)||[]).length + '/' + (setting.totalProg||30), {
-      x: 0.3, y: 3.6, w: 11.4, h: 0.35,
-      fontSize: 10, color: C_GRAY, italic: true
-    });
-
-    // ---- SLIDE 3: Pencapaian per Kategori ----
-    var s3 = pptx.addSlide();
-    addBg(s3, C_LIGHT);
-    s3.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: '100%', h: 0.8, fill: { color: C_DARK } });
-    s3.addText('📋 PENCAPAIAN PER KATEGORI — ' + bulanStr.toUpperCase(), {
-      x: 0.3, y: 0.1, w: 11, h: 0.6, fontSize: 16, bold: true, color: C_WHITE
-    });
-
-    var tblRows = [
-      [
-        { text: 'Kategori',       options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 10 } },
-        { text: 'Target',         options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 10, align: 'center' } },
-        { text: 'Selesai',        options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 10, align: 'center' } },
-        { text: '% Pencapaian',   options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 10, align: 'center' } },
-        { text: 'Status',         options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 10, align: 'center' } }
-      ]
-    ];
-
-    var totT = 0, totS = 0;
-    Object.keys(KATEGORI).forEach(function(kat) {
-      var nos     = KATEGORI[kat];
-      var target  = nos.length;
-      var selesai = nos.filter(function(n) { return data.doneSet.has(n); }).length;
-      var pct    = target > 0 ? Math.round(selesai / target * 100) : 0;
-      var status = pct >= 100 ? '✅ Tercapai' : pct >= 50 ? '⏳ Proses' : '❌ Kurang';
-      var rowFill = pct >= 100 ? 'dcfce7' : pct >= 50 ? 'fef9c3' : 'fee2e2';
-      totT += target; totS += selesai;
-
-      tblRows.push([
-        { text: kat,             options: { bold: true, fontSize: 9, fill: rowFill } },
-        { text: String(target),  options: { align: 'center', fontSize: 9, fill: rowFill } },
-        { text: String(selesai), options: { align: 'center', fontSize: 9, fill: rowFill, color: '15803d', bold: true } },
-        { text: pct + '%',       options: { align: 'center', fontSize: 9, fill: rowFill, bold: true } },
-        { text: status,          options: { align: 'center', fontSize: 9, fill: rowFill, bold: true } }
-      ]);
-    });
-
-    var totPct2 = totT > 0 ? Math.round(totS / totT * 100) : 0;
-    tblRows.push([
-      { text: 'TOTAL', options: { bold: true, fontSize: 10, fill: 'bbf7d0', color: C_DARK } },
-      { text: String(totT), options: { align: 'center', bold: true, fontSize: 10, fill: 'bbf7d0' } },
-      { text: String(totS), options: { align: 'center', bold: true, fontSize: 10, fill: 'bbf7d0', color: '15803d' } },
-      { text: totPct2 + '%', options: { align: 'center', bold: true, fontSize: 11, fill: 'bbf7d0', color: C_GREEN } },
-      { text: '', options: { fill: 'bbf7d0' } }
-    ]);
-
-    s3.addTable(tblRows, {
-      x: 0.3, y: 0.9, w: 11.4,
-      colW: [4.4, 1.5, 1.5, 2.0, 2.0],
-      border: { type: 'solid', color: 'd1d5db', pt: 0.5 },
-      autoPage: false
-    });
-
-    // ---- SLIDE 4: Pencapaian per Bulan ----
-    var s4 = pptx.addSlide();
-    addBg(s4, C_LIGHT);
-    s4.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: '100%', h: 0.8, fill: { color: C_DARK } });
-    s4.addText('📅 PENCAPAIAN PER BULAN — TAHUN ' + tahun, {
-      x: 0.3, y: 0.1, w: 11, h: 0.6, fontSize: 16, bold: true, color: C_WHITE
-    });
-
-    var tblBulan = [[
-      { text: 'Bulan',         options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9 } },
-      { text: 'Tgt Prog',      options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9, align: 'center' } },
-      { text: 'Prog Tercapai', options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9, align: 'center' } },
-      { text: 'Upload Dok',    options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9, align: 'center' } },
-      { text: 'Total',         options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9, align: 'center' } },
-      { text: 'Status',        options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9, align: 'center' } }
-    ]];
-
-    var nowM2 = new Date().getMonth() + 1;
-    var nowY2 = new Date().getFullYear();
-
-    for (var m = 1; m <= 12; m++) {
-      var tProg2 = (setting.progBulan && setting.progBulan[m]) || 0;
-      var upsBulanIni2 = (data.allUps||[]).filter(function(x) {
-        var d = toDateObj(getUpDate(x));
-        return d && d.getFullYear() === tahun && d.getMonth() + 1 === m;
-      });
-      var p2 = new Set(upsBulanIni2.map(function(x) { return x.no; })).size;
-      var u2 = upsBulanIni2.length;
-      var tot2 = u2;
-      var isCur = (m === nowM2 && tahun === nowY2);
-      var rowFill2 = isCur ? 'dcfce7' : (m % 2 === 0 ? 'f9fafb' : C_WHITE);
-      var metTarget = (tProg2 === 0 || p2 >= tProg2);
-      var statusStr = (tProg2 > 0)
-        ? (metTarget ? '✅' : (p2 > 0 ? '⏳' : '—'))
-        : '';
-
-      tblBulan.push([
-        { text: BULAN_NAMA[m] + (isCur ? ' ◀' : ''), options: { bold: isCur, fontSize: 9, fill: rowFill2 } },
-        { text: tProg2 > 0 ? String(tProg2) : '—', options: { align: 'center', fontSize: 9, fill: rowFill2 } },
-        { text: String(p2),   options: { align: 'center', fontSize: 9, fill: rowFill2, color: p2 > 0 ? '15803d' : C_GRAY, bold: p2 > 0 } },
-        { text: String(u2),   options: { align: 'center', fontSize: 9, fill: rowFill2, color: u2 > 0 ? '7c3aed' : C_GRAY, bold: u2 > 0 } },
-        { text: String(tot2), options: { align: 'center', fontSize: 9, fill: rowFill2, bold: true } },
-        { text: statusStr,    options: { align: 'center', fontSize: 9, fill: rowFill2 } }
-      ]);
-    }
-
-    s4.addTable(tblBulan, {
-      x: 0.3, y: 0.9, w: 11.4,
-      colW: [2.0, 1.5, 2.0, 2.0, 1.9, 2.0],
-      border: { type: 'solid', color: 'd1d5db', pt: 0.5 },
-      autoPage: false
-    });
-
-    // ---- SLIDE 5: Detail Program (1-15) ----
-    var s5 = pptx.addSlide();
-    addBg(s5, C_LIGHT);
-    s5.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: '100%', h: 0.8, fill: { color: C_DARK } });
-    s5.addText('✅ STATUS PROGRAM KERJA (1–15)', {
-      x: 0.3, y: 0.1, w: 11, h: 0.6, fontSize: 16, bold: true, color: C_WHITE
-    });
-
-    var allUpsFull = getLS(KU);
-    var doneSetFull = new Set(allUpsFull.map(function(x) { return x.no; }));
-
-    var tblProg1 = [[
-      { text: 'No',      options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9 } },
-      { text: 'Program', options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9 } },
-      { text: 'Kategori',options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9 } },
-      { text: 'Status',  options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9, align: 'center' } },
-      { text: 'Tgl Upload Terakhir', options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9 } }
-    ]];
-
-    function getKatForNo(no) {
-      var found = '-';
-      Object.keys(KATEGORI).forEach(function(k) {
-        if (KATEGORI[k].indexOf(no) !== -1) found = k;
-      });
-      return found;
-    }
-
-    function getLastUploadForProg(no) {
-      var recs = allUpsFull.filter(function(x) { return x.no === no; });
-      if (!recs.length) return null;
-      recs.sort(function(a, b) { return new Date(b.at || 0) - new Date(a.at || 0); });
-      return recs[0];
-    }
-
-    for (var n = 1; n <= 15; n++) {
-      var isDone2 = doneSetFull.has(n);
-      var rec2    = getLastUploadForProg(n);
-      var tglStr2 = rec2 && rec2.tglUpload ? fmtDateOnly(rec2.tglUpload) : '-';
-      var rowFill3 = isDone2 ? 'dcfce7' : 'fff7ed';
-
-      tblProg1.push([
-        { text: String(n),        options: { align: 'center', bold: true, fontSize: 9, fill: rowFill3 } },
-        { text: TITLES[n],        options: { fontSize: 8, fill: rowFill3 } },
-        { text: getKatForNo(n),   options: { fontSize: 8, fill: rowFill3, color: C_GRAY } },
-        { text: isDone2 ? '✅ Selesai' : '⏳ Belum', options: { align: 'center', fontSize: 9, fill: rowFill3, bold: true, color: isDone2 ? '15803d' : '92400e' } },
-        { text: tglStr2,          options: { fontSize: 8, fill: rowFill3, color: C_GRAY } }
-      ]);
-    }
-
-    s5.addTable(tblProg1, {
-      x: 0.3, y: 0.9, w: 11.4,
-      colW: [0.5, 4.2, 1.8, 1.5, 1.8],
-      border: { type: 'solid', color: 'd1d5db', pt: 0.5 },
-      autoPage: false
-    });
-
-    // ---- SLIDE 6: Detail Program (16-30) ----
-    var s6 = pptx.addSlide();
-    addBg(s6, C_LIGHT);
-    s6.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: '100%', h: 0.8, fill: { color: C_DARK } });
-    s6.addText('✅ STATUS PROGRAM KERJA (16–30)', {
-      x: 0.3, y: 0.1, w: 11, h: 0.6, fontSize: 16, bold: true, color: C_WHITE
-    });
-
-    var tblProg2 = [[
-      { text: 'No',      options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9 } },
-      { text: 'Program', options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9 } },
-      { text: 'Kategori',options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9 } },
-      { text: 'Status',  options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9, align: 'center' } },
-      { text: 'Tgl Upload Terakhir', options: { bold: true, color: C_WHITE, fill: C_DARK, fontSize: 9 } }
-    ]];
-
-    for (var n2 = 16; n2 <= 30; n2++) {
-      var isDone3 = doneSetFull.has(n2);
-      var rec3    = getLastUploadForProg(n2);
-      var tglStr3 = rec3 && rec3.tglUpload ? fmtDateOnly(rec3.tglUpload) : '-';
-      var rowFill4 = isDone3 ? 'dcfce7' : 'fff7ed';
-
-      tblProg2.push([
-        { text: String(n2),       options: { align: 'center', bold: true, fontSize: 9, fill: rowFill4 } },
-        { text: TITLES[n2],       options: { fontSize: 8, fill: rowFill4 } },
-        { text: getKatForNo(n2),  options: { fontSize: 8, fill: rowFill4, color: C_GRAY } },
-        { text: isDone3 ? '✅ Selesai' : '⏳ Belum', options: { align: 'center', fontSize: 9, fill: rowFill4, bold: true, color: isDone3 ? '15803d' : '92400e' } },
-        { text: tglStr3,          options: { fontSize: 8, fill: rowFill4, color: C_GRAY } }
-      ]);
-    }
-
-    s6.addTable(tblProg2, {
-      x: 0.3, y: 0.9, w: 11.4,
-      colW: [0.5, 4.2, 1.8, 1.5, 1.8],
-      border: { type: 'solid', color: 'd1d5db', pt: 0.5 },
-      autoPage: false
-    });
-
-    // ---- SLIDE 7+: LAMPIRAN FOTO DOKUMENTASI IMPLEMENTASI PROGRAM ----
-    // Menampilkan semua jenis foto (gambar) yang sudah diupload melalui menu Upload Dokumen.
-    var allUpsForPhoto = (getLS(KU) || []).filter(function(x) {
-      return x.file && x.file.type && x.file.type.indexOf('image/') === 0 && x.file.data;
-    });
-
-    if (allUpsForPhoto.length) {
-      var perSlide = 4; // 2x2 grid foto per slide
-      var totalPhotoSlides = Math.ceil(allUpsForPhoto.length / perSlide);
-      for (var ps = 0; ps < totalPhotoSlides; ps++) {
-        var sAtt = pptx.addSlide();
-        addBg(sAtt, C_LIGHT);
-        sAtt.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: '100%', h: 0.7, fill: { color: C_DARK } });
-        sAtt.addText('📸 LAMPIRAN DOKUMENTASI IMPLEMENTASI PROGRAM (' + (ps + 1) + '/' + totalPhotoSlides + ')', {
-          x: 0.3, y: 0.1, w: 11, h: 0.5, fontSize: 14, bold: true, color: C_WHITE
-        });
-
-        var chunk = allUpsForPhoto.slice(ps * perSlide, ps * perSlide + perSlide);
-        var positions = [
-          { x: 0.4,  y: 0.95 }, { x: 6.15, y: 0.95 },
-          { x: 0.4,  y: 3.55 }, { x: 6.15, y: 3.55 }
-        ];
-        chunk.forEach(function(item, idx) {
-          var pos = positions[idx];
-          try {
-            sAtt.addImage({ data: item.file.data, x: pos.x, y: pos.y, w: 5.4, h: 2.35, sizing: { type: 'contain', w: 5.4, h: 2.35 } });
-          } catch(e) { console.warn('addImage lampiran gagal:', e); }
-          var caption = 'P' + item.no + ' — ' + (item.title || '') +
-                        ' (' + fmtDateOnly(item.tglUpload) + ')';
-          sAtt.addText(caption, {
-            x: pos.x, y: pos.y + 2.38, w: 5.4, h: 0.3,
-            fontSize: 8, color: C_GRAY, align: 'center'
-          });
+  if (id) {
+    arr = arr.map(function(x) {
+      if (String(x.id) === String(id)) {
+        return Object.assign({}, x, {
+          namaUnit: namaUnit, nomorUnit: nomorUnit, kategori: kategori, lokasiArea: lokasiArea,
+          petugas: petugas, noSertifikat: noSertifikat, catatan: catatan,
+          tglKomisioning: tglKomisioning, tglBerakhir: tglBerakhir,
+          fileDokumen: fileName || x.fileDokumen || null
         });
       }
-    } else {
-      var sAttEmpty = pptx.addSlide();
-      addBg(sAttEmpty, C_LIGHT);
-      sAttEmpty.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: '100%', h: 0.7, fill: { color: C_DARK } });
-      sAttEmpty.addText('📸 LAMPIRAN DOKUMENTASI IMPLEMENTASI PROGRAM', {
-        x: 0.3, y: 0.1, w: 11, h: 0.5, fontSize: 14, bold: true, color: C_WHITE
-      });
-      sAttEmpty.addText('Belum ada foto (dokumen bertipe gambar) yang diupload.', {
-        x: 0.3, y: 2.5, w: 11, h: 0.5, fontSize: 13, color: C_GRAY, italic: true, align: 'center'
-      });
+      return x;
+    });
+    setLS(KKOM, arr.slice(0, 1000));
+    closeKomForm();
+    renderKomisioning();
+    showToast('Data unit berhasil diperbarui!');
+
+    if (navigator.onLine) {
+      komApi.update(id, {
+        nama_unit: namaUnit, nomor_unit: nomorUnit, kategori: kategori,
+        lokasi_area: lokasiArea, petugas_komisioning: petugas, no_sertifikat: noSertifikat,
+        tanggal_komisioning: tglKomisioning, tanggal_berakhir: tglBerakhir, catatan: catatan
+      }).then(function(res) { if (res.error) console.error('update komisioning:', res.error); })
+        .catch(function(e) { console.error(e); });
     }
+  } else {
+    var localId = 'k' + Date.now() + Math.floor(Math.random() * 1000);
+    var rec = {
+      id: localId,
+      namaUnit: namaUnit, nomorUnit: nomorUnit, kategori: kategori, lokasiArea: lokasiArea,
+      petugas: petugas, noSertifikat: noSertifikat, catatan: catatan,
+      tglKomisioning: tglKomisioning, tglBerakhir: tglBerakhir,
+      fileDokumen: fileName, at: new Date().toISOString()
+    };
+    arr.unshift(rec);
+    setLS(KKOM, arr.slice(0, 1000));
+    closeKomForm();
+    renderKomisioning();
+    showToast('Unit komisioning berhasil disimpan!');
 
-    // ---- SLIDE Penutup ----
-    var s8 = pptx.addSlide();
-    addBg(s8, '14532d');
-    s8.addShape(pptx.ShapeType.rect, { x: 0, y: 2.5, w: '100%', h: 0.06, fill: { color: C_GREEN } });
-    s8.addText('Terima Kasih', {
-      x: 0.5, y: 0.8, w: 11, h: 1.0,
-      fontSize: 40, bold: true, color: C_WHITE, align: 'center'
-    });
-    s8.addText('KPP Mining — Plant Safety Department', {
-      x: 0.5, y: 1.9, w: 11, h: 0.5,
-      fontSize: 14, color: '86efac', align: 'center', italic: true
-    });
-    s8.addText('📊 Total Program: ' + data.progDone + '/' + (setting.totalProg||30) +
-               '   |   📁 Upload: ' + (getLS(KU)||[]).length +
-               '   |   📈 Pencapaian: ' + data.pct + '%', {
-      x: 0.5, y: 2.8, w: 11, h: 0.5,
-      fontSize: 13, color: C_GREEN, align: 'center', bold: true
-    });
-    s8.addText('Laporan dibuat otomatis oleh Safety Dashboard\n' +
-               new Date().toLocaleDateString('id-ID', { weekday:'long', year:'numeric', month:'long', day:'numeric' }), {
-      x: 0.5, y: 3.5, w: 11, h: 0.7,
-      fontSize: 11, color: '4ade80', align: 'center'
-    });
-    s8.addText('Confidential — Internal Use Only', {
-      x: 0.5, y: 4.5, w: 11, h: 0.4,
-      fontSize: 10, color: '4ade80', align: 'center', italic: true
-    });
+    if (navigator.onLine) {
+      komApi.create({
+        nama_unit: namaUnit, nomor_unit: nomorUnit, kategori: kategori,
+        lokasi_area: lokasiArea, petugas_komisioning: petugas, no_sertifikat: noSertifikat,
+        tanggal_komisioning: tglKomisioning, tanggal_berakhir: tglBerakhir, catatan: catatan
+      }).then(function(res) {
+        if (res.error) { console.error('create komisioning:', res.error); return; }
+        // Ganti id lokal sementara dengan id asli dari server (serial primary key)
+        if (res.data && res.data.id) {
+          var cur = getKomAll();
+          var idx = cur.findIndex(function(x) { return x.id === localId; });
+          if (idx > -1) { cur[idx].id = res.data.id; setLS(KKOM, cur); }
+        }
+      }).catch(function(e) { console.error(e); });
+    }
+  }
+}
 
-    // Simpan file
-    var fileName = 'KPP_Safety_' + bulanStr.replace(/\s+/g, '_') + '_' + new Date().toISOString().slice(0,10) + '.pptx';
-    pptx.writeFile({ fileName: fileName }).then(function() {
-      showToast('✅ File PPT berhasil diunduh: ' + fileName);
-    }).catch(function(e) {
-      console.error('PPT error:', e);
-      showToast('Gagal membuat PPT: ' + e.message, 'error');
-    });
+// ---- Detail & Riwayat ----
+function openKomDetail(id) {
+  var rec = getKomAll().find(function(x) { return String(x.id) === String(id); });
+  if (!rec) return;
+  komSelectedId = id;
+  var status = hitungStatusKom(rec.tglBerakhir);
+  var history = getKomHistory(rec.nomorUnit);
 
-  } catch(e) {
-    console.error('exportPPT error:', e);
-    showToast('Gagal export PPT: ' + e.message, 'error');
+  var html = '';
+  html += '<div class="kv-row"><span class="k">Nama Unit</span><span class="v">' + esc(rec.namaUnit) + '</span></div>';
+  html += '<div class="kv-row"><span class="k">Nomor Unit</span><span class="v">' + esc(rec.nomorUnit) + '</span></div>';
+  html += '<div class="kv-row"><span class="k">Kategori</span><span class="v">' + esc(rec.kategori || '-') + '</span></div>';
+  html += '<div class="kv-row"><span class="k">Lokasi/Area</span><span class="v">' + esc(rec.lokasiArea || '-') + '</span></div>';
+  html += '<div class="kv-row"><span class="k">Petugas Komisioning</span><span class="v">' + esc(rec.petugas || '-') + '</span></div>';
+  html += '<div class="kv-row"><span class="k">No. Sertifikat</span><span class="v">' + esc(rec.noSertifikat || '-') + '</span></div>';
+  html += '<div class="kv-row"><span class="k">Tanggal Komisioning</span><span class="v">' + fmtDateOnly(rec.tglKomisioning) + '</span></div>';
+  html += '<div class="kv-row"><span class="k">Tanggal Berakhir</span><span class="v">' + fmtDateOnly(rec.tglBerakhir) + '</span></div>';
+  html += '<div class="kv-row"><span class="k">Status</span><span class="v">' + komBadge(status) + '</span></div>';
+  html += '<div class="kv-row"><span class="k">Dokumen</span><span class="v">' + esc(rec.fileDokumen || '-') + '</span></div>';
+  html += '<div class="kv-row"><span class="k">Catatan</span><span class="v">' + esc(rec.catatan || '-') + '</span></div>';
+
+  if (history.length > 1) {
+    html += '<div class="summary-title" style="margin-top:14px;">🕘 Riwayat Komisioning Ulang</div>';
+    html += '<div class="tbl-wrap"><table><thead><tr><th>Tgl Komisioning</th><th>Tgl Berakhir</th><th>Petugas</th><th>Status saat itu</th></tr></thead><tbody>';
+    history.forEach(function(h) {
+      html += '<tr' + (String(h.id) === String(rec.id) ? ' style="background:rgba(34,197,94,.06);"' : '') + '>' +
+        '<td>' + fmtDateOnly(h.tglKomisioning) + '</td>' +
+        '<td>' + fmtDateOnly(h.tglBerakhir) + '</td>' +
+        '<td>' + esc(h.petugas || '-') + '</td>' +
+        '<td>' + komBadge(hitungStatusKom(h.tglBerakhir)) + '</td>' +
+      '</tr>';
+    });
+    html += '</tbody></table></div>';
+  }
+
+  document.getElementById('komDetailBody').innerHTML = html;
+  document.getElementById('komDetailEditBtn').onclick = function() { closeKomDetail(); openKomForm(rec.id); };
+  document.getElementById('komDetailDeleteBtn').onclick = function() { deleteKomisioning(rec.id); };
+  document.getElementById('komDetailModal').classList.add('show');
+}
+
+function closeKomDetail() {
+  document.getElementById('komDetailModal').classList.remove('show');
+}
+
+function deleteKomisioning(id) {
+  if (!confirm('Hapus data unit komisioning ini?')) return;
+  var arr = getKomAll().filter(function(x) { return String(x.id) !== String(id); });
+  setLS(KKOM, arr);
+  closeKomDetail();
+  renderKomisioning();
+  showToast('Data unit dihapus.');
+
+  if (navigator.onLine) {
+    komApi.remove(id).then(function(res) {
+      if (res.error) console.error('delete komisioning:', res.error);
+    }).catch(function(e) { console.error(e); });
   }
 }
 
@@ -1948,10 +1133,8 @@ if ('serviceWorker' in navigator) {
 // STORAGE EVENT (sync antar tab/perangkat)
 // ============================================================
 window.addEventListener('storage', function(e) {
-  if (e.key === KU || e.key === KT) {
-    refreshAll();
-    if (currentView === 'history')    renderHistory();
-    if (currentView === 'setting')    renderSettingTable();
+  if (e.key === KKOM && currentView === 'komisioning') {
+    renderKomisioning();
   }
 });
 
@@ -1959,17 +1142,7 @@ window.addEventListener('storage', function(e) {
 // INIT
 // ============================================================
 function init() {
-  try { fillFilterTahun(); } catch(e) {}
-  filterTahun = new Date().getFullYear();
-  // Set filter default ke tahun ini
-  var fThn = document.getElementById('fTahun');
-  if (fThn) fThn.value = filterTahun;
-  var badge = document.getElementById('filterBadge');
-  if (badge) badge.textContent = 'Tahun ' + filterTahun;
-
-  try { fillDateSelects('upTgl','upBln','upThn'); } catch(e) {}
-  try { initDD(); } catch(e) {}
-  try { refreshAll(); } catch(e) {}
+  try { renderKomisioning(); } catch(e) {}
   try { loadFromSupabase(); } catch(e) { console.error('init loadFromSupabase:', e); }
 
   // Auto sync tiap 30 detik

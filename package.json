@@ -1,7 +1,8 @@
 {
-  "name": "kpp-safety-dashboard",
+  "name": "kpp-komisioning-dashboard",
   "version": "1.0.0",
   "private": true,
+  "description": "Dashboard Monitoring Komisioning Unit - KPP Mining",
   "dependencies": {
     "pg": "^8.11.3"
   }
