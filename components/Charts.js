@@ -1,5 +1,0 @@
-"use client";
-import {ResponsiveContainer,LineChart,Line,XAxis,YAxis,CartesianGrid,BarChart,Bar,Cell} from "recharts";
-const t={fontSize:12,fill:"#5c6b6b"},g=<CartesianGrid stroke="#e6e8e6"/>;
-export function Trend({data}){return <ResponsiveContainer width="100%" height={260}><LineChart data={data} margin={{top:10,right:16,left:-16}}>{g}<XAxis dataKey="l" tick={t} axisLine={false} tickLine={false}/><YAxis allowDecimals={false} tick={t} axisLine={false} tickLine={false}/><Line type="monotone" dataKey="n" stroke="#a0522d" strokeWidth={2} dot={{r:5,fill:"#a0522d"}}/></LineChart></ResponsiveContainer>}
-export function Dist({data}){return <ResponsiveContainer width="100%" height={260}><BarChart layout="vertical" data={data} margin={{right:16}}>{g}<XAxis type="number" allowDecimals={false} tick={t} axisLine={false} tickLine={false}/><YAxis type="category" dataKey="k" width={90} tick={t} axisLine={false} tickLine={false}/><Bar dataKey="n" radius={4} barSize={28}>{data.map(d=><Cell key={d.k} fill={d.c}/>)}</Bar></BarChart></ResponsiveContainer>}
